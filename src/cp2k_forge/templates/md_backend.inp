@@ -1,0 +1,59 @@
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT {project}
+  RUN_TYPE MD
+&END GLOBAL
+
+&MOTION
+  &MD
+    ENSEMBLE NPT_I
+    STEPS {steps}
+    TEMPERATURE {temperature}
+    TIMESTEP {timestep}
+    &BAROSTAT
+      PRESSURE [bar] {pressure_bar}
+      TIMECON [fs] 1000
+    &END BAROSTAT
+    &THERMOSTAT
+      &CSVR
+        TIMECON [fs] 100
+      &END CSVR
+    &END THERMOSTAT
+  &END MD
+  &PRINT
+    &CELL
+      &EACH
+        MD 10
+      &END EACH
+    &END CELL
+  &END PRINT
+&END MOTION
+
+&FORCE_EVAL
+  METHOD FIST
+  &MM
+    &FORCEFIELD
+      &NONBONDED
+        &METATOMIC
+          ATOMS {atoms}
+          POT_FILE_NAME {model_pt}
+        &END METATOMIC
+      &END NONBONDED
+    &END FORCEFIELD
+    &POISSON
+      &EWALD
+        EWALD_TYPE none
+      &END EWALD
+    &END POISSON
+  &END MM
+  &SUBSYS
+    &CELL
+      ABC [angstrom] {abc}
+      PERIODIC XYZ
+    &END CELL
+    &TOPOLOGY
+      COORD_FILE_FORMAT XYZ
+      COORD_FILE_NAME {coord_file}
+    &END TOPOLOGY
+  &END SUBSYS
+&END FORCE_EVAL

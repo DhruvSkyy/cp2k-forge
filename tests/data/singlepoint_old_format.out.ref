@@ -1,0 +1,38 @@
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 NoMix/Diag. 0.40E+00    0.3     0.00000000       -34.2469135780 -3.42E+01
+     2 DIIS/Diag. 0.98E-07    0.1     0.00000000       -34.2469135780 -2.13E-13
+
+  *** SCF run converged in     2 steps ***
+
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy [a.u.]:              -34.246913578024
+
+
+ ATOMIC FORCES in [a.u.]
+
+ # Atom   Kind   Element          X              Y              Z
+      1      1      H        0.00100000     0.00200000    -0.00300000
+      2      1      H       -0.00100000    -0.00200000     0.00300000
+ SUM OF ATOMIC FORCES           0.00000000     0.00000000     0.00000000     0.00000000
+
+ STRESS| Analytical stress tensor [GPa]
+ STRESS|                        x                   y                   z
+ STRESS|      x        0.1000000000E+01    0.0000000000E+00    0.0000000000E+00
+ STRESS|      y        0.0000000000E+00    0.1000000000E+01    0.0000000000E+00
+ STRESS|      z        0.0000000000E+00    0.0000000000E+00    0.1000000000E+01
+ STRESS|
+ STRESS| 1/3 Trace                                           0.1000000000E+01
+ STRESS| Determinant                                         0.1000000000E+01
+
+ -------------------------------------------------------------------------------
+ -                                                                             -
+ -                                T I M I N G                                  -
+ -                                                                             -
+ -------------------------------------------------------------------------------
+
+ The number of warnings for this run is : 0
+
+ **** **** ******  **  PROGRAM ENDED AT                   2024-01-01 00:00:00.000

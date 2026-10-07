@@ -1,0 +1,98 @@
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT {project}
+  RUN_TYPE MD
+&END GLOBAL
+
+&MOTION
+  &MD
+    ENSEMBLE NVT
+    STEPS {steps}
+    TIMESTEP {timestep_fs}
+    TEMPERATURE {temperature}
+    &THERMOSTAT
+      TYPE NOSE
+      &NOSE
+        TIMECON 50.0
+      &END NOSE
+    &END THERMOSTAT
+  &END MD
+  &PRINT
+    &TRAJECTORY
+      FORMAT XYZ
+      &EACH
+        MD {sample_every}
+      &END EACH
+    &END TRAJECTORY
+    &VELOCITIES
+      FORMAT XYZ
+      &EACH
+        MD {sample_every}
+      &END EACH
+    &END VELOCITIES
+    &RESTART
+      &EACH
+        MD 200
+      &END EACH
+    &END RESTART
+    &RESTART_HISTORY OFF
+    &END RESTART_HISTORY
+  &END PRINT
+&END MOTION
+{ext_restart}
+&FORCE_EVAL
+  METHOD Quickstep
+  &DFT
+    BASIS_SET_FILE_NAME BASIS_MOLOPT
+    POTENTIAL_FILE_NAME GTH_POTENTIALS
+    &MGRID
+      CUTOFF {cutoff}
+      REL_CUTOFF {rel_cutoff}
+    &END MGRID
+    &QS
+      EPS_DEFAULT 1.0E-12
+      METHOD GPW
+      EXTRAPOLATION ASPC
+      EXTRAPOLATION_ORDER 3
+    &END QS
+    &SCF
+      EPS_SCF {eps_scf}
+      MAX_SCF {max_scf}
+      SCF_GUESS ATOMIC
+      &OT
+        MINIMIZER DIIS
+        PRECONDITIONER FULL_SINGLE_INVERSE
+      &END OT
+      &OUTER_SCF
+        EPS_SCF {eps_scf}
+        MAX_SCF 20
+      &END OUTER_SCF
+    &END SCF
+    &XC
+      &XC_FUNCTIONAL
+        &PBE
+          PARAMETRIZATION {functional}
+        &END PBE
+      &END XC_FUNCTIONAL
+      &VDW_POTENTIAL
+        DISPERSION_FUNCTIONAL PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          TYPE DFTD3{d3_suffix}
+          PARAMETER_FILE_NAME dftd3.dat
+          REFERENCE_FUNCTIONAL {dispersion_ref}
+          R_CUTOFF 16.0
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+    &END XC
+  &END DFT
+  &SUBSYS
+    &CELL
+      ABC [angstrom] {abc}
+      PERIODIC XYZ
+    &END CELL
+    &COORD
+{coord_block}
+    &END COORD
+{kind_blocks}
+  &END SUBSYS
+&END FORCE_EVAL

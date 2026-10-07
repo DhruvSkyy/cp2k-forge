@@ -1,0 +1,103 @@
+# SELF-TEST config — prove your install works on ANY machine, with NO CP2K and NO GPU.
+#
+# Labels come from the foundation calculator (dft.backend=mock_foundation), not DFT, so the
+# whole loop (generate -> subsample -> label -> train -> validate) runs using only the
+# Python dependencies. This is plumbing only, never science. It needs mace-torch + ase
+# installed; MACE-MP-0 downloads once on first use.
+#
+#   cp2k-forge --config configs/smoke.yaml
+#
+# Expected: one pass completes, a model trains, a held-out force RMSE prints, and
+# <workdir>/manifest.json is written. Runtime is a couple of minutes on a laptop CPU.
+
+system:
+  name: watersmoke
+  seed_xyz: ../examples/water32.xyz   # 32 H2O box shipped with the repo
+  elements: [H, O]
+  cell_abc: [9.8528, 9.8528, 9.8528]
+
+dft:
+  backend: mock_foundation    # THE point of this config: no CP2K required
+  mock_model: mace-mp-0
+  mock_device: cpu
+  functional: revPBE          # unused by the mock backend, kept for template rendering
+  dispersion_ref: revPBE
+  d3_damping: zero
+
+generator:
+  model: mace-mp-0
+  dispersion: true
+  device: cpu
+
+explore:
+  temperatures_k: [300]
+  density_scales: [1.0]
+  ensemble: NPT
+  barostat: mtk               # exercises the MTK path (falls back to ase.md.npt.NPT on old ASE)
+  nvt_thermostat: bussi
+  steps: 400
+  timestep_fs: 0.5
+  sample_every: 4
+  equilibration_steps: 40
+  pressure_bar: 1.0
+  compressibility_au: 4.57e-5
+  density_min_gcc: 0.5        # lenient clamp for the smoke (foundation model is stable)
+  density_max_gcc: 1.5
+  clamp_patience: 5
+  sample_mode: decorrelation
+  decorrelation_observable: hbond
+  target_uncorrelated: 5
+  min_sample_every_fs: 20.0   # tiny floor so a short run still yields a few frames
+  on_undersample: warn
+
+subsample:
+  n_per_pass: 4
+  method: direct
+  min_frames: 2
+  enabled: true
+
+train:
+  mace_run_train_bin: mace_run_train
+  device: cpu
+  seed: 1
+  num_channels: 16            # tiny model — this is a plumbing test, not an accuracy run
+  max_ell: 1
+  r_max: 4.0
+  num_interactions: 2
+  batch_size: 2
+  max_num_epochs: 5
+  valid_fraction: 0.25
+  e0s_mode: isolated          # mock backend computes foundation-model atom E0s (no CP2K)
+  energy_key: REF_energy
+  forces_key: REF_forces
+  stress_key: REF_stress
+
+loop:
+  max_passes: 1
+  force_rmse_tol_mev_ang: 40.0
+  density_tol_gcc: 0.005
+  min_rel_improvement_force: 0.0
+
+validate:
+  enabled: true
+  n_dft_spotcheck: 2
+  spotcheck_md_steps: 100
+  spotcheck_temperature_k: 300.0
+  validate_previous_model: false
+  rdf_ref_xyz: null
+  vdos_ref_npy: null
+  rdf_r_max: 4.5              # < L/2 for the 32-water smoke box
+  rdf_nbins: 90
+  vdos_enabled: false        # skip the extra NVE leg — keeps the self-test fast
+  density_probe_steps: 200
+  density_probe_temperature_k: 300.0
+
+showcase:
+  temperatures_k: [277]
+  pressure_bar: 1.0
+  steps: 1000
+  equilibration_steps: 200
+  timestep_fs: 0.5
+  barostat: mtk
+
+workdir: runs/smoke          # relative to the current directory

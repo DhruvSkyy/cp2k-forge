@@ -1,0 +1,119 @@
+# Campaign: a domain-specific MACE for bulk liquid water at the revPBE-D3 level,
+# validated by its temperature of maximum density (TMD, experiment ~277 K).
+#
+# Edit this one file to retarget the pipeline: DFT level, explore grid, model size,
+# convergence. This example is machine-agnostic. The CP2K binary, its data files, and
+# the parallel launch are chosen at run time by environment variables, so the same
+# config runs on a laptop or any cluster:
+#   CP2K_BIN           path to the CP2K binary (else dft.cp2k_bin below)
+#   CP2K_DATA_DIR      directory with BASIS_MOLOPT, GTH_POTENTIALS, dftd3.dat
+#   CP2K_MPI_LAUNCHER  "mpirun" (default) or "none" for an OMP-only build
+#   CP2K_RANKS         MPI ranks per DFT single point (else dft.cp2k_ranks)
+# Relative input paths in this file (seed_xyz, reference data, e0s_file) resolve from
+# this file's directory, so the config travels with the files it names; workdir is
+# relative to the current directory. Absolute paths pass through unchanged.
+
+system:
+  name: water
+  # 96-atom (32 H2O) cubic box shipped with the repo; a fine seed for MD.
+  seed_xyz: ../examples/water32.xyz
+  elements: [H, O]
+  cell_abc: [9.8528, 9.8528, 9.8528]   # Angstrom
+
+dft:
+  functional: revPBE          # water workhorse; swap to revPBE0/SCAN here later
+  dispersion_ref: revPBE      # REFERENCE_FUNCTIONAL for the D3 correction
+  d3_damping: zero            # zero-damping D3 (BJ inverts ice/water density order; JCP 161:131102)
+  cutoff_ry: 400.0
+  rel_cutoff_ry: 50.0
+  basis_set: TZV2P-MOLOPT-GTH   # standard water basis (SR variant absent for H/O)
+  potential: GTH-PBE           # GTH-PBE pseudos are standard for (rev)PBE water
+  eps_scf: 1.0e-7              # tight for force-label fidelity (cheap; ~1-2 extra SCF iters)
+  max_scf: 40                  # insurance vs silently non-converged frames (poison labels)
+  cp2k_bin: cp2k.psmp          # overridden by $CP2K_BIN when set
+  cp2k_ranks: 4                # overridden by $CP2K_RANKS when set
+
+generator:
+  model: mace-mp-0             # foundation model used ONLY as a structure sampler
+  dispersion: true             # D3 is mandatory for water (MP-0 has none -> evaporates)
+  device: cpu                  # set to "cuda" for a GPU (MACE MD is much faster there)
+  engine: ase                  # "ase" runs anywhere; "cp2k-backend" needs a metatomic-enabled CP2K build
+
+explore:
+  temperatures_k: [250, 270, 290, 310]
+  density_scales: [0.95, 1.0, 1.05]    # initial box scaling to bracket the equilibrium
+  ensemble: NPT                # sample density too (1 atm); more phase space than NVT
+  steps: 62000                 # ~31 ps/cell; long enough to yield target_uncorrelated
+                               # frames per cell at the 1 ps floor (see decorrelation
+                               # below). For a quick smoke test, override on the command
+                               # line: --set explore.steps=4000 --set explore.target_uncorrelated=2
+  timestep_fs: 0.5
+  sample_every: 20             # raw probe stride (10 fs) for the decorrelation analysis
+  equilibration_steps: 2000    # discard 1 ps before sampling
+  pressure_bar: 1.0
+  compressibility_au: 4.57e-5  # water isothermal compressibility, per bar
+  density_min_gcc: 0.6         # NPT stability clamp: abort a trajectory that leaves
+  density_max_gcc: 1.3         # this window (guards under-trained-model box collapse)
+  clamp_patience: 5
+  sample_mode: decorrelation   # subsample each trajectory at its measured decorrelation time
+  decorrelation_observable: hbond
+  target_uncorrelated: 30      # per-cell cap on uncorrelated frames
+  min_sample_every_fs: 1000.0  # 1 ps floor (H-bond lifetime argument)
+
+subsample:
+  # Data-efficient selection: label only the most informative structures, not the whole
+  # decorrelated pool. DIRECT (MACE-MP-0 features -> PCA -> KMeans) picks the minimal set
+  # that spans configuration space (cf. Schran 2021: ~300 structures total suffice for
+  # water). Set enabled=false to A/B against labelling every decorrelated frame.
+  n_per_pass: 10              # label 10 structures per training iteration
+  method: direct              # "direct" (minimal spanning set) | "fps" | "none"
+  min_frames: 5
+  enabled: true
+
+train:
+  mace_run_train_bin: mace_run_train
+  device: cpu                 # set to "cuda" for GPU training
+  seed: 1
+  # Compact by design — the speed claim depends on keeping this small.
+  num_channels: 96            # accuracy headroom; drop to 64 if throughput needs it
+  max_ell: 2
+  r_max: 6.0                  # one more shell for water structure
+  num_interactions: 2
+  batch_size: 5
+  max_num_epochs: 500
+  valid_fraction: 0.1
+  energy_key: REF_energy
+  forces_key: REF_forces
+  stress_key: REF_stress
+
+loop:
+  max_passes: 20              # 10 structures/pass -> many small iterations; the early
+                              # stop below halts as soon as accuracy plateaus
+  force_rmse_tol_mev_ang: 40.0
+  density_tol_gcc: 0.005
+  min_rel_improvement_force: 0.05   # data-efficiency stop: quit once a pass improves the
+                                    # force RMSE by <5% over the last (more labels aren't
+                                    # buying accuracy). Keeps the labelled set minimal.
+  # max_wall_hours: 24        # optional, scheduler-agnostic wall-clock cap for the loop
+
+validate:                     # accuracy scorecard (Schran et al. 2021) after each pass
+  enabled: true
+  n_dft_spotcheck: 10         # DFT single points on the model's own dynamics -> force score
+  spotcheck_md_steps: 2000
+  spotcheck_temperature_k: 300.0
+  validate_previous_model: true   # also score the prior model (both at the DFT reference)
+  rdf_ref_xyz: null           # optional: path to a revPBE-D3 reference trajectory for RDF
+  vdos_ref_npy: null          # optional: reference VDOS (2-col cm^-1, intensity .npy)
+  rdf_r_max: 6.0
+  rdf_nbins: 120
+  vdos_md_steps: 20000
+  vdos_temperature_k: 300.0
+
+showcase:
+  temperatures_k: [250, 260, 270, 277, 285, 295, 310, 320]
+  pressure_bar: 1.0
+  steps: 100000
+  equilibration_steps: 20000
+  timestep_fs: 0.5
+
+workdir: runs/water           # relative to the current directory unless absolute
