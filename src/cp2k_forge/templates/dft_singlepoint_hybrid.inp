@@ -1,0 +1,96 @@
+! Hybrid (PBE0-family) single point under ADMM with a truncated Coulomb operator.
+! revPBE0 = PARAMETRIZATION REVPBE, SCALE_X 0.75 + &HF FRACTION 0.25.
+! No stress print: HFX/ADMM stress is version-fragile and stress_weight is 0 in
+! every campaign; parse_singlepoint_output tolerates the missing block.
+! CUTOFF_RADIUS must be < min(cell)/2 for THIS frame (enforced in cp2k_io) and is
+! part of the level of theory — never change it between frames of one campaign.
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT {project}
+  RUN_TYPE ENERGY_FORCE
+&END GLOBAL
+
+&FORCE_EVAL
+  METHOD Quickstep
+  &DFT
+    BASIS_SET_FILE_NAME BASIS_MOLOPT
+    BASIS_SET_FILE_NAME BASIS_ADMM
+    POTENTIAL_FILE_NAME GTH_POTENTIALS
+    CHARGE {charge}
+    &MGRID
+      CUTOFF {cutoff}
+      REL_CUTOFF {rel_cutoff}
+    &END MGRID
+    &QS
+      EPS_DEFAULT 1.0E-12
+      METHOD GPW
+    &END QS
+    &AUXILIARY_DENSITY_MATRIX_METHOD
+      METHOD BASIS_PROJECTION
+      ADMM_PURIFICATION_METHOD {admm_purification}
+      EXCH_SCALING_MODEL NONE
+      EXCH_CORRECTION_FUNC {admm_exch_correction_func}
+    &END AUXILIARY_DENSITY_MATRIX_METHOD
+    &SCF
+      EPS_SCF {eps_scf}
+      MAX_SCF {max_scf}
+      SCF_GUESS ATOMIC
+      &OT
+        MINIMIZER DIIS
+        ! Anion SCF stalls: switch to PRECONDITIONER FULL_ALL if OT cycles.
+        PRECONDITIONER FULL_SINGLE_INVERSE
+      &END OT
+      &OUTER_SCF
+        EPS_SCF {eps_scf}
+        MAX_SCF 20
+      &END OUTER_SCF
+    &END SCF
+    &XC
+      &XC_FUNCTIONAL
+        &PBE
+          PARAMETRIZATION {functional}
+          SCALE_X {gga_x_scale}
+          SCALE_C 1.0
+        &END PBE
+      &END XC_FUNCTIONAL
+      &HF
+        FRACTION {hf_fraction}
+        &SCREENING
+          EPS_SCHWARZ {eps_schwarz}
+          SCREEN_ON_INITIAL_P .FALSE.
+        &END SCREENING
+        &INTERACTION_POTENTIAL
+          POTENTIAL_TYPE TRUNCATED
+          CUTOFF_RADIUS {hfx_cutoff_radius}
+          T_C_G_DATA t_c_g.dat
+        &END INTERACTION_POTENTIAL
+        &MEMORY
+          MAX_MEMORY {hfx_max_memory}
+        &END MEMORY
+      &END HF
+      &VDW_POTENTIAL
+        DISPERSION_FUNCTIONAL PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          TYPE DFTD3{d3_suffix}
+          PARAMETER_FILE_NAME dftd3.dat
+          REFERENCE_FUNCTIONAL {dispersion_ref}
+          R_CUTOFF 16.0
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+    &END XC
+  &END DFT
+  &PRINT
+    &FORCES ON
+    &END FORCES
+  &END PRINT
+  &SUBSYS
+    &CELL
+      ABC [angstrom] {abc}
+      PERIODIC XYZ
+    &END CELL
+    &COORD
+{coord_block}
+    &END COORD
+{kind_blocks}
+  &END SUBSYS
+&END FORCE_EVAL

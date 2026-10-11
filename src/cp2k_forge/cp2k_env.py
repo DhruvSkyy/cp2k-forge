@@ -27,6 +27,20 @@ from pathlib import Path
 
 CP2K_DATA_FILES = ("BASIS_MOLOPT", "GTH_POTENTIALS", "dftd3.dat")
 
+# Extra data files the hybrid (ADMM + truncated-Coulomb HFX) templates reference.
+# Both ship in every standard CP2K data directory.
+CP2K_HYBRID_DATA_FILES = ("BASIS_ADMM", "t_c_g.dat")
+
+
+def required_data_files(dft=None) -> tuple[str, ...]:
+    """The data files the configured labelling level needs (GGA base set, plus the
+    ADMM/HFX files when dft.mode is "hybrid"). Directory derivation deliberately
+    keeps probing for the base set only — the layout is the same either way."""
+    if dft is not None and getattr(dft, "mode", "gga") == "hybrid":
+        return CP2K_DATA_FILES + CP2K_HYBRID_DATA_FILES
+    return CP2K_DATA_FILES
+
+
 # Well-known binary names, used only for the doctor's fix hints (never auto-selected).
 KNOWN_BINARY_NAMES = ("cp2k.psmp", "cp2k.ssmp", "cp2k", "cp2k.popt", "cp2k.sopt")
 

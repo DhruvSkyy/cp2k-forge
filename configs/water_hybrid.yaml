@@ -1,0 +1,119 @@
+# Campaign: a domain-specific MACE for bulk liquid water at the HYBRID revPBE0-D3
+# level (ADMM + truncated-Coulomb exact exchange) — the level of theory of the
+# report's headline water and fluoride campaigns (Report 2, Table A.1).
+#
+# The dft block below is the production level verbatim. Everything else (sampler,
+# selection, training, validation) uses the tool's portable defaults; tune per
+# campaign as with configs/water.yaml. Costs to expect: one hybrid single point on
+# this 192-atom cell is ~10 core-hours (Ice Lake); the semi-local configs/water.yaml
+# level is ~13x cheaper per label.
+#
+# Relative input paths resolve from this file's directory. CP2K is selected at run
+# time via CP2K_BIN etc.; hybrid labelling additionally needs BASIS_ADMM and
+# t_c_g.dat in the CP2K data directory (cp2k-forge --check verifies this).
+
+system:
+  name: water_hybrid
+  # 64 H2O at 0.9966 g/cc, equilibrated box. L/2 = 6.22 A > the 5.5 A HFX radius,
+  # which a 32-water box (L/2 = 4.93 A) could not legally carry.
+  seed_xyz: ../examples/water64.xyz
+  elements: [H, O]
+  cell_abc: [12.4313, 12.4313, 12.4313]
+
+dft:
+  mode: hybrid                # renders dft_singlepoint_hybrid.inp (ADMM + HFX)
+  functional: revPBE          # GGA exchange base; revPBE0 = revPBE + 25% exact exchange
+  hf_fraction: 0.25           # &HF FRACTION; GGA SCALE_X = 1 - hf_fraction (derived)
+  dispersion_ref: revPBE0     # D3 parameters for the HYBRID functional, not the GGA base
+  d3_damping: zero
+  cutoff_ry: 400.0
+  rel_cutoff_ry: 50.0
+  basis_set: TZV2P-MOLOPT-GTH
+  potential: GTH-PBE
+  charge: 0
+  hfx_cutoff_radius_ang: 5.5  # truncated Coulomb; part of the level of theory — never
+                              # change it mid-campaign. Must stay < min(cell)/2 for
+                              # every labelled frame (guarded per frame).
+  eps_schwarz: 1.0e-6
+  hfx_max_memory_mb: 2400     # per MPI rank; raise on fat nodes to cut HFX recomputation
+  admm_basis: cpFIT3
+  admm_basis_overrides: {}    # per-element AUX_FIT, e.g. {F: aug-cpFIT3} for anions
+  admm_purification: MO_DIAG
+  admm_exch_correction_func: PBEX
+  eps_scf: 1.0e-7
+  max_scf: 60
+  cp2k_bin: cp2k.psmp
+  cp2k_ranks: 32              # hybrid points want wider runs than GGA (see docs)
+  label_workers: 1
+
+generator:
+  model: mace-mp-0
+  dispersion: true            # mandatory for water with MP-0 (no dispersion of its own)
+  device: cpu                 # "cuda" on a GPU node
+  engine: ase
+
+explore:
+  temperatures_k: [300]
+  density_scales: [1.0]
+  ensemble: NVT               # ambient-only NVT exploration (the report's protocol for
+                              # this system; density mechanisms stay off)
+  nvt_thermostat: bussi
+  steps: 62000
+  timestep_fs: 0.5
+  sample_every: 20
+  equilibration_steps: 2000
+  sample_mode: decorrelation
+  decorrelation_observable: hbond
+  target_uncorrelated: 30
+  min_sample_every_fs: 1000.0
+
+subsample:
+  n_per_pass: 10
+  n_first_pass: 10
+  method: random              # the report's selector; fps/direct are drop-in options
+  min_frames: 8
+  enabled: true
+
+train:
+  mace_run_train_bin: mace_run_train
+  device: cpu                 # "cuda" on a GPU node
+  seed: 1
+  num_channels: 96            # the report's compact recipe: 96ch, L=2, r_max 5.0, ZBL
+  max_ell: 2
+  r_max: 5.0
+  num_interactions: 2
+  batch_size: 5
+  max_num_epochs: 500
+  valid_fraction: 0.1
+  stress_weight: 0.0          # hybrid labels carry NO stress (template prints none) —
+                              # keep this 0 for mode: hybrid
+  pair_repulsion: true
+  e0s_mode: isolated          # spin-polarized neutral atoms at the exact hybrid level
+  energy_key: REF_energy
+  forces_key: REF_forces
+  stress_key: REF_stress
+
+loop:
+  max_passes: 15
+  force_rmse_tol_mev_ang: 40.0
+  density_tol_gcc: 0.005
+  min_rel_improvement_force: 0.05
+
+validate:
+  enabled: true
+  n_dft_spotcheck: 10
+  spotcheck_md_steps: 2000
+  spotcheck_temperature_k: 300.0
+  validate_previous_model: true
+  rdf_r_max: 6.0
+  rdf_nbins: 120
+
+showcase:
+  temperatures_k: [250, 260, 270, 277, 285, 295, 310, 320]
+  pressure_bar: 1.0
+  steps: 100000
+  equilibration_steps: 20000
+  timestep_fs: 0.5
+  barostat: mtk
+
+workdir: runs/water_hybrid

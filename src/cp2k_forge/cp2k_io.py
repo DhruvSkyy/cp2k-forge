@@ -19,6 +19,8 @@ _TEMPLATE_DIR = resources.files(__package__) / "templates"
 TEMPLATE = _TEMPLATE_DIR / "dft_singlepoint.inp"
 ATOM_TEMPLATE = _TEMPLATE_DIR / "dft_atom.inp"
 AIMD_TEMPLATE = _TEMPLATE_DIR / "aimd_reference.inp"
+HYBRID_TEMPLATE = _TEMPLATE_DIR / "dft_singlepoint_hybrid.inp"
+HYBRID_ATOM_TEMPLATE = _TEMPLATE_DIR / "dft_atom_hybrid.inp"
 
 
 def _coord_block(atoms) -> str:
@@ -28,33 +30,73 @@ def _coord_block(atoms) -> str:
     return "\n".join(lines)
 
 
-def _kind_blocks(elements, basis: str, potential: str) -> str:
-    """Per-element &KIND blocks (BASIS_SET + POTENTIAL for each element)."""
+def _kind_blocks(
+    elements,
+    basis: str,
+    potential: str,
+    admm_basis: str | None = None,
+    admm_overrides: dict | None = None,
+) -> str:
+    """Per-element &KIND blocks. With admm_basis set (hybrid mode), each kind also
+    gets a BASIS_SET AUX_FIT line (per-element override via admm_overrides, e.g.
+    a diffuse aug-cpFIT3 for anions). Default (None) output is byte-identical to
+    the pre-hybrid version — the GGA path must never change."""
+    overrides = admm_overrides or {}
     blocks = []
     for el in elements:
-        blocks.append(
-            "\n".join(
-                [
-                    f"    &KIND {el}",
-                    f"      BASIS_SET {basis}",
-                    f"      POTENTIAL {potential}",
-                    "    &END KIND",
-                ]
-            )
-        )
+        lines = [f"    &KIND {el}", f"      BASIS_SET {basis}"]
+        if admm_basis is not None:
+            lines.append(f"      BASIS_SET AUX_FIT {overrides.get(el, admm_basis)}")
+        lines.append(f"      POTENTIAL {potential}")
+        lines.append("    &END KIND")
+        blocks.append("\n".join(lines))
     return "\n".join(blocks)
 
 
+def _check_hfx_radius(dft, cell) -> None:
+    """Truncated-Coulomb legality for THIS frame: radius < min(cell)/2.
+
+    NPT-explored candidates carry their own (possibly compressed) cells; a frame
+    that fails here cannot be labelled at this level of theory. Failing loud beats
+    silently varying the interaction potential between training points."""
+    half = min(cell) / 2.0
+    if dft.hfx_cutoff_radius_ang >= half:
+        raise ValueError(
+            f"HFX CUTOFF_RADIUS {dft.hfx_cutoff_radius_ang} A >= min(cell)/2 = "
+            f"{half:.3f} A for this frame — illegal truncated Coulomb. Tighten "
+            "explore.density_max_gcc (preferred) or lower dft.hfx_cutoff_radius_ang "
+            "BEFORE the campaign starts."
+        )
+
+
+def _hybrid_format_args(dft) -> dict:
+    """The extra template fields the hybrid templates need, derived from DFTConfig.
+    gga_x_scale is always computed as 1 - hf_fraction — never a second config knob."""
+    return dict(
+        charge=int(getattr(dft, "charge", 0)),
+        gga_x_scale=f"{1.0 - dft.hf_fraction:.4f}",
+        hf_fraction=f"{dft.hf_fraction:.4f}",
+        eps_schwarz=dft.eps_schwarz,
+        hfx_cutoff_radius=f"{dft.hfx_cutoff_radius_ang:.2f}",
+        hfx_max_memory=int(dft.hfx_max_memory_mb),
+        admm_purification=dft.admm_purification,
+        admm_exch_correction_func=dft.admm_exch_correction_func,
+    )
+
+
 def _inject_charge(text: str, charge: int) -> str:
-    """Post-process CHARGE into a rendered input (for a charged box).
-    charge == 0 returns the text unchanged."""
+    """Post-process CHARGE into a rendered GGA input (for a charged box).
+    charge == 0 returns the text unchanged, keeping the GGA path byte-identical."""
     if not charge:
         return text
     return text.replace("  &DFT\n", f"  &DFT\n    CHARGE {charge}\n", 1)
 
 
 def write_singlepoint_input(atoms, dft, project: str, out_path: str | Path) -> Path:
-    """Render a GGA DFT single-point input for one structure. Returns the written path."""
+    """Render a DFT single-point input for one structure. Returns the written path.
+
+    dft.mode selects the template: "gga" (default, byte-identical to the original
+    water path) or "hybrid" (PBE0-family + ADMM + truncated Coulomb + CHARGE)."""
     cell = atoms.get_cell().lengths()
     elements = sorted(set(atoms.get_chemical_symbols()))
     # CP2K D3 damping: "DFTD3" = zero damping; "DFTD3(BJ)" = Becke-Johnson.
@@ -75,11 +117,25 @@ def write_singlepoint_input(atoms, dft, project: str, out_path: str | Path) -> P
         abc=f"{cell[0]:.6f} {cell[1]:.6f} {cell[2]:.6f}",
         coord_block=_coord_block(atoms),
     )
-    text = TEMPLATE.read_text().format(
-        **common,
-        kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
-    )
-    text = _inject_charge(text, int(getattr(dft, "charge", 0)))
+    if getattr(dft, "mode", "gga") == "hybrid":
+        _check_hfx_radius(dft, cell)
+        text = HYBRID_TEMPLATE.read_text().format(
+            **common,
+            **_hybrid_format_args(dft),
+            kind_blocks=_kind_blocks(
+                elements,
+                dft.basis_set,
+                dft.potential,
+                admm_basis=dft.admm_basis,
+                admm_overrides=getattr(dft, "admm_basis_overrides", None),
+            ),
+        )
+    else:
+        text = TEMPLATE.read_text().format(
+            **common,
+            kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
+        )
+        text = _inject_charge(text, int(getattr(dft, "charge", 0)))
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text)
@@ -116,10 +172,26 @@ def write_atom_input(
         abc=f"{cell[0]:.6f} {cell[1]:.6f} {cell[2]:.6f}",
         coord_block=_coord_block(atoms),
     )
-    text = ATOM_TEMPLATE.read_text().format(
-        **common,
-        kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
-    )
+    if getattr(dft, "mode", "gga") == "hybrid":
+        _check_hfx_radius(dft, cell)
+        # The atom template hardcodes CHARGE 0: E0 references stay neutral even for
+        # a charged labelling cell, so the charge key is stripped from the args.
+        text = HYBRID_ATOM_TEMPLATE.read_text().format(
+            **common,
+            **{k: v for k, v in _hybrid_format_args(dft).items() if k != "charge"},
+            kind_blocks=_kind_blocks(
+                elements,
+                dft.basis_set,
+                dft.potential,
+                admm_basis=dft.admm_basis,
+                admm_overrides=getattr(dft, "admm_basis_overrides", None),
+            ),
+        )
+    else:
+        text = ATOM_TEMPLATE.read_text().format(
+            **common,
+            kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
+        )
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text)

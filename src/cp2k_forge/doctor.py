@@ -21,7 +21,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import cp2k_env
-from .cp2k_env import CP2K_DATA_FILES
 
 # (import name, pip/display name, required?) — matplotlib is optional (plots only).
 _DEPENDENCIES = [
@@ -120,6 +119,7 @@ def _check_cp2k_binary(cfg) -> Check:
 
 
 def _check_cp2k_data(cfg) -> Check:
+    required = cp2k_env.required_data_files(cfg.dft if cfg else None)
     data_dir, source = cp2k_env.resolve_data_dir(cfg.dft if cfg else None)
     if data_dir is None:
         return Check(
@@ -127,17 +127,19 @@ def _check_cp2k_data(cfg) -> Check:
             "FAIL",
             "CP2K_DATA_DIR unset and no data directory next to the CP2K binary",
             "export CP2K_DATA_DIR=/path/to/cp2k/data (must hold "
-            + ", ".join(CP2K_DATA_FILES)
+            + ", ".join(required)
             + ")",
         )
-    missing = [f for f in CP2K_DATA_FILES if not (data_dir / f).exists()]
+    missing = [f for f in required if not (data_dir / f).exists()]
     if missing:
+        hint = "export CP2K_DATA_DIR at a directory that has " + ", ".join(required)
+        if any(f in cp2k_env.CP2K_HYBRID_DATA_FILES for f in missing):
+            hint += " (dft.mode: hybrid additionally needs BASIS_ADMM and t_c_g.dat)"
         return Check(
             "cp2k:data",
             "FAIL",
             f"missing {missing} in {data_dir}",
-            "export CP2K_DATA_DIR at a directory that has "
-            + ", ".join(CP2K_DATA_FILES),
+            hint,
         )
     if source == "derived":
         # The label stage exports this derived path to the CP2K subprocess, so no

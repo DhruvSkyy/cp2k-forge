@@ -36,6 +36,28 @@ class DFTConfig:
     potential: str = "GTH-PBE"  # GTH-PBE pseudos are standard for (rev)PBE water
     eps_scf: float = 1.0e-6
     max_scf: int = 20
+    # --- hybrid / ADMM (mode="gga" keeps the GGA path byte-identical) ---
+    # mode="hybrid" renders templates/dft_singlepoint_hybrid.inp: a PBE-family GGA
+    # exchange scaled by (1 - hf_fraction) plus exact exchange under ADMM with a
+    # truncated Coulomb operator (revPBE0 = functional revPBE + hf_fraction 0.25).
+    mode: str = "gga"  # "gga" | "hybrid"
+    hf_fraction: float = 0.25  # &HF FRACTION; GGA SCALE_X = 1 - hf_fraction
+    hfx_cutoff_radius_ang: float = (
+        6.0  # truncated Coulomb radius; MUST be < min(cell)/2
+    )
+    # for EVERY labelled frame (guarded per frame in
+    # cp2k_io) and must never change mid-campaign
+    # (it is part of the level of theory)
+    eps_schwarz: float = 1.0e-6  # &HF &SCREENING EPS_SCHWARZ
+    hfx_max_memory_mb: int = 2400  # &HF &MEMORY MAX_MEMORY, per MPI rank
+    admm_basis: str = "cpFIT3"  # AUX_FIT basis for every kind (BASIS_ADMM file)
+    admm_basis_overrides: dict = field(default_factory=dict)  # per-element AUX_FIT
+    # override, e.g. {F: aug-cpFIT3} — anions want
+    # diffuse auxiliary functions
+    admm_purification: str = "MO_DIAG"  # ADMM_PURIFICATION_METHOD
+    admm_exch_correction_func: str = (
+        "PBEX"  # EXCH_CORRECTION_FUNC (EXCH_SCALING_MODEL NONE)
+    )
     # --- electrostatics ---
     charge: int = 0  # &DFT CHARGE: net cell charge (e.g. -1 for a
     # charged box; compensated by the GPW background).
@@ -453,6 +475,39 @@ class Config:
             )
         if self.dft.backend not in ("cp2k", "mock_foundation"):
             raise ValueError("dft.backend must be 'cp2k' or 'mock_foundation'")
+        if self.dft.mode not in ("gga", "hybrid"):
+            raise ValueError("dft.mode must be 'gga' or 'hybrid'")
+        if self.dft.mode == "hybrid":
+            # Truncated-Coulomb legality: the HFX cutoff radius must fit inside the
+            # minimum image of every cell that will ever be labelled. Two checks:
+            # (1) the seed cell here; (2) a per-frame hard error in cp2k_io for the
+            # NPT-explored candidates, whose cells shrink under compression.
+            half_min_cell = min(self.system.cell_abc) / 2.0
+            if self.dft.hfx_cutoff_radius_ang >= half_min_cell:
+                raise ValueError(
+                    f"dft.hfx_cutoff_radius_ang={self.dft.hfx_cutoff_radius_ang} must "
+                    f"be < min(system.cell_abc)/2 = {half_min_cell:.3f} A "
+                    "(truncated Coulomb)"
+                )
+            if not (0.0 < self.dft.hf_fraction <= 1.0):
+                raise ValueError("dft.hf_fraction must be in (0, 1]")
+            # Couple the explorer's density ceiling to HFX legality: at density_max the
+            # cubic cell shrinks to L_seed * (rho_seed/rho_max)^(1/3); frames beyond
+            # 2*radius are unlabelable at this level of theory.
+            ex = self.explore
+            if ex.ensemble.upper() == "NPT" and ex.density_max_gcc:
+                # Seed density ~1 g/cc assumed (aqueous systems); at density_max the
+                # cell edge is l_seed / density_max^(1/3). Margin 0.2 A.
+                l_seed = min(self.system.cell_abc)
+                l_at_max = l_seed / ex.density_max_gcc ** (1.0 / 3.0)
+                if l_at_max <= 2.0 * self.dft.hfx_cutoff_radius_ang + 0.2:
+                    raise ValueError(
+                        f"explore.density_max_gcc={ex.density_max_gcc} lets NPT cells "
+                        f"shrink to ~{l_at_max:.2f} A < 2 x hfx_cutoff_radius + margin "
+                        f"({2 * self.dft.hfx_cutoff_radius_ang + 0.2:.2f} A): such "
+                        "frames cannot be labelled with this truncated-Coulomb radius. "
+                        "Lower density_max_gcc or hfx_cutoff_radius_ang."
+                    )
         if self.generator.engine not in ("ase", "cp2k-backend", "symmetrix"):
             raise ValueError(
                 "generator.engine must be 'ase' (default) or 'cp2k-backend' (needs the MACE "
