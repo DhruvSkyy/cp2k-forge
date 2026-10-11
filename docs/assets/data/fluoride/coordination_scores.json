@@ -1,0 +1,10 @@
+{
+  "observable": "F-O first-shell coordination (hydration) number",
+  "metric": "n_FO = int_0^rmin 4 pi r^2 rho_O g_FO dr; rho_O = 64/12.445^3 = 0.03320 /A^3; rmin = AIMD g_FO first minimum",
+  "rmin_ang": 3.375,
+  "n_FO": {
+    "this_work_pass8": 5.25,
+    "aimd": 5.37,
+    "committee": 5.12
+  }
+}

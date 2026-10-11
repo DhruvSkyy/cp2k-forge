@@ -1,0 +1,8 @@
+n_labels,pass_index,force_rmse_mev_ang,sigma_mev_ang,force_score_pct,source
+20,1,57.314,0.321,92.92,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)
+30,2,54.565,0.315,93.26,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)
+40,3,52.773,0.320,93.48,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)
+60,4,69.781,0.554,91.38,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)
+70,5,50.651,0.349,93.74,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)
+80,6,49.911,0.346,93.83,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)
+90,7,49.564,0.344,93.87,runs/water64_ambient/trackB/v2_on_ambient/convergence.json (n_labels = runs/water64_hybrid/manifest.json passes[].n_labelled_total)

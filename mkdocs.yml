@@ -1,0 +1,98 @@
+site_name: CP2K-FORGE
+site_description: Forge compact system-specific MACE potentials with CP2K as the DFT labelling engine
+repo_url: https://github.com/DhruvSkyy/cp2k-forge
+repo_name: DhruvSkyy/cp2k-forge
+edit_uri: ""
+strict: true
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            members_order: source
+            show_source: true
+            show_root_heading: true
+            separate_signature: true
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+      - CP2K as a dependency: getting-started/cp2k-dependency.md
+  - User guide:
+      - How it works: guide/how-it-works.md
+      - Configuration reference: guide/configuration.md
+      - Hybrid DFT (revPBE0-D3): guide/hybrid-dft.md
+      - Campaigns on HPC: guide/campaigns-hpc.md
+      - Validation and gates: guide/validation.md
+      - Showcase and density: guide/showcase-density.md
+      - Troubleshooting: guide/troubleshooting.md
+  - Case studies:
+      - case-studies/index.md
+      - Bulk liquid water: case-studies/water.md
+      - Fluoride in water: case-studies/fluoride.md
+      - Cost and data efficiency: case-studies/cost.md
+  - Reference:
+      - CLI: reference/cli.md
+      - API — pipeline stages: reference/api/pipeline.md
+      - API — config and I/O: reference/api/config-io.md
+      - API — environment: reference/api/environment.md
+      - Input templates: reference/templates.md
+  - About:
+      - Method notes: about/method.md
+      - Provenance and citation: about/provenance.md
+      - Changelog: about/changelog.md
+      - License: about/license.md

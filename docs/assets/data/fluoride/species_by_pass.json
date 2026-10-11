@@ -1,0 +1,103 @@
+{
+ "description": "Per-species force RMSE (meV/Ang) for every fluoride pass model, all re-scored on the SAME frozen 37-frame held-out set. Produced by dev/mace_distill/scripts/cross_eval.py ours-on-his (job 33533172, 2026-08-12). Instrument check: the overall column reproduces convergence.json at every pass, and pass 8 reproduces the per-species F 183.4 / H 31.8 / O 86.6 already in the report. CORRECTION 2026-08-13: n_labelled_total re-sourced from the campaign manifest (9,16,22,28,34,44,54,64); an earlier export wrote a uniform +8 ladder (24,32,40,48,56) for passes 3-7, which never matched the manifest or the printed table.",
+ "test_path": "mace_distill/runs/fh2o_headtohead/test_set.xyz",
+ "n_frames": 37,
+ "atom_counts": {
+  "F": 1,
+  "H": 128,
+  "O": 64,
+  "total": 193
+ },
+ "reference_force_rms_mev_ang": {
+  "F": 397.0,
+  "H": 808.7,
+  "O": 1111.1
+ },
+ "passes": [
+  {
+   "pass": 1,
+   "n_labelled_total": 9,
+   "force_rmse_mev_ang": {
+    "F": 274.0666,
+    "H": 61.5557,
+    "O": 117.0796,
+    "overall": 86.3001
+   }
+  },
+  {
+   "pass": 2,
+   "n_labelled_total": 16,
+   "force_rmse_mev_ang": {
+    "F": 230.1061,
+    "H": 48.3138,
+    "O": 102.0135,
+    "overall": 72.618
+   }
+  },
+  {
+   "pass": 3,
+   "n_labelled_total": 22,
+   "force_rmse_mev_ang": {
+    "F": 222.5127,
+    "H": 44.1452,
+    "O": 98.0441,
+    "overall": 68.8231
+   }
+  },
+  {
+   "pass": 4,
+   "n_labelled_total": 28,
+   "force_rmse_mev_ang": {
+    "F": 202.6651,
+    "H": 40.2474,
+    "O": 95.4205,
+    "overall": 65.6233
+   }
+  },
+  {
+   "pass": 5,
+   "n_labelled_total": 34,
+   "force_rmse_mev_ang": {
+    "F": 200.6716,
+    "H": 37.5739,
+    "O": 92.2961,
+    "overall": 63.0062
+   }
+  },
+  {
+   "pass": 6,
+   "n_labelled_total": 44,
+   "force_rmse_mev_ang": {
+    "F": 191.0139,
+    "H": 35.164,
+    "O": 89.8642,
+    "overall": 60.7209
+   }
+  },
+  {
+   "pass": 7,
+   "n_labelled_total": 54,
+   "force_rmse_mev_ang": {
+    "F": 188.8268,
+    "H": 33.3973,
+    "O": 87.8878,
+    "overall": 59.0414
+   }
+  },
+  {
+   "pass": 8,
+   "n_labelled_total": 64,
+   "force_rmse_mev_ang": {
+    "F": 183.4374,
+    "H": 31.7583,
+    "O": 86.5747,
+    "overall": 57.6949
+   }
+  }
+ ],
+ "pass8_mse_share_pct": {
+  "F": 5.24,
+  "H": 20.1,
+  "O": 74.67
+ }
+}

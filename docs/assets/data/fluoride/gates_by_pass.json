@@ -1,0 +1,131 @@
+{
+ "source": {
+  "scores": "cp2k-mlp-density/report2_data/fh2o_headtohead/scores_vs_aimd.json",
+  "manifest": "mace_distill/runs/fh2o_headtohead/manifest.json",
+  "force": "convergence.json (frozen 37-frame re-evaluation of every pass model)"
+ },
+ "reference": "raw revPBE0-D3 AIMD, 52.026 ps, 10 x 5 ps blocks",
+ "metric": "AML curve overlap, 5 pairs (O-O,O-H,H-H,F-O,F-H) equal weight, r_max 6.0 Ang / 120 bins; block SD from the 10 x 5 ps AIMD blocks",
+ "note": "force_score_pct is the global-metric score on the FROZEN 37-frame test set, every pass model re-evaluated on the same frames (not the campaign manifest's growing set); rdf/vdos are scored through score_vs_aimd.py. Both endpoints of every pass-to-pass delta come through one instrument.",
+ "first_on_policy_pass": 6,
+ "campaign_stopped_at_pass": 8,
+ "stop_rule": "pre-registered THRESHOLDS.md: paired frame bootstrap, U95(delta) < 2.0 meV/Ang and L05(delta) > -2.0 on two consecutive passes, force score floor 90 %. Fired at pass 8 (see convergence.json pairs).",
+ "committee_50ps": {
+  "rdf_pct_vs_aimd": 98.26,
+  "vdos_pct_vs_aimd": 98.91
+ },
+ "committee_11ps": {
+  "rdf_pct_vs_aimd": 97.69,
+  "vdos_pct_vs_aimd": 97.7
+ },
+ "pass": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8
+ ],
+ "n_labels": [
+  9,
+  16,
+  22,
+  28,
+  34,
+  44,
+  54,
+  64
+ ],
+ "force_score_pct": [
+  90.61,
+  92.1,
+  92.51,
+  92.86,
+  93.14,
+  93.39,
+  93.57,
+  93.72
+ ],
+ "force_rmse_mev_ang": [
+  86.3,
+  72.62,
+  68.82,
+  65.62,
+  63.01,
+  60.72,
+  59.04,
+  57.69
+ ],
+ "rdf_pct_vs_aimd": [
+  95.3,
+  94.31,
+  93.45,
+  93.73,
+  93.44,
+  96.72,
+  96.02,
+  97.23
+ ],
+ "rdf_pct_block_sd": [
+  0.703,
+  0.724,
+  0.791,
+  0.879,
+  0.657,
+  0.408,
+  0.558,
+  0.516
+ ],
+ "vdos_pct_vs_aimd": [
+  98.07,
+  97.43,
+  97.26,
+  97.39,
+  97.13,
+  99.0,
+  98.42,
+  98.7
+ ],
+ "vdos_pct_block_sd": [
+  0.242,
+  0.292,
+  0.551,
+  0.225,
+  0.336,
+  0.297,
+  0.274,
+  0.675
+ ],
+ "on_policy": [
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
+  true
+ ],
+ "density_gcc": [
+  0.8969,
+  0.8409,
+  0.8427,
+  0.8344,
+  0.7809,
+  0.8138,
+  0.7777,
+  0.801
+ ],
+ "min_oo_ang": [
+  2.537,
+  2.541,
+  2.493,
+  2.493,
+  2.492,
+  2.616,
+  2.569,
+  2.525
+ ]
+}

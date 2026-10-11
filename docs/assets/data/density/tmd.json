@@ -1,0 +1,122 @@
+{
+  "champion": "n300_s1_sw01",
+  "verdict": "UNRESOLVED (sampling-limited): the point fit on the weighted means has no interior maximum (cold-end densities are within noise of the 280 K peak) and only 49% (quad) / 68% (cubic) of bootstrap draws yield one. Claim only: a broad density-maximum region below ~290 K, consistent with (not excluding) the 284-289 K literature values for this functional class. Do NOT quote a TMD value or window in prose.",
+  "per_T_weighted_means": [
+    {
+      "T_K": 250.0,
+      "rho_gcc": 0.9514,
+      "sem_gcc": 0.0139
+    },
+    {
+      "T_K": 260.0,
+      "rho_gcc": 0.9359,
+      "sem_gcc": 0.0113
+    },
+    {
+      "T_K": 270.0,
+      "rho_gcc": 0.9366,
+      "sem_gcc": 0.0084
+    },
+    {
+      "T_K": 280.0,
+      "rho_gcc": 0.9527,
+      "sem_gcc": 0.0111
+    },
+    {
+      "T_K": 290.0,
+      "rho_gcc": 0.9308,
+      "sem_gcc": 0.0143
+    },
+    {
+      "T_K": 300.0,
+      "rho_gcc": 0.939,
+      "sem_gcc": 0.0092
+    },
+    {
+      "T_K": 310.0,
+      "rho_gcc": 0.9247,
+      "sem_gcc": 0.0113
+    },
+    {
+      "T_K": 320.0,
+      "rho_gcc": 0.9101,
+      "sem_gcc": 0.0095
+    },
+    {
+      "T_K": 330.0,
+      "rho_gcc": 0.9176,
+      "sem_gcc": 0.0102
+    }
+  ],
+  "raw_argmax_K": 280.0,
+  "point_fit_K": {
+    "deg2": null,
+    "deg3": null
+  },
+  "bootstrap": {
+    "deg2": {
+      "degree": 2,
+      "median_K": 273.6,
+      "ci68_K": [
+        261.0,
+        283.8
+      ],
+      "ci95_K": [
+        252.1,
+        291.3
+      ],
+      "n_interior": 4879,
+      "n_boundary": 5121,
+      "frac_interior": 0.488
+    },
+    "deg3": {
+      "degree": 3,
+      "median_K": 274.0,
+      "ci68_K": [
+        263.0,
+        298.3
+      ],
+      "ci95_K": [
+        253.5,
+        309.0
+      ],
+      "n_interior": 6831,
+      "n_boundary": 3169,
+      "frac_interior": 0.683
+    }
+  },
+  "seed_sensitivity_3model": {
+    "per_model_point_fits_K": {
+      "n300_s1": {
+        "deg2": 291.8,
+        "deg3": 282.6
+      },
+      "n300_s1_sw01": {
+        "deg2": null,
+        "deg3": null
+      },
+      "n300_s2": {
+        "deg2": 292.4,
+        "deg3": 292.8
+      }
+    },
+    "range_K": [
+      282.6,
+      292.8
+    ],
+    "note": "single-replica for n300_s1/s2 at most T; reported as seed spread only"
+  },
+  "reconciliation": {
+    "superseded": [
+      "README 'window 255-285 K' (raw per-T reading, no fit uncertainty)",
+      "CAMPAIGN_RHO_T 'mean ~286 K' (3-model fit incl. single-replica seeds)"
+    ],
+    "adopted": "champion-only bootstrap window below; 3-model range kept as seed sensitivity"
+  },
+  "provenance": {
+    "csv": "/rds/user/ds2173/hpc-work/cp2k-mlp-density/dev/mace_distill/results_rho_t.csv",
+    "B": 10000,
+    "seed": 0,
+    "script": "dev/mace_distill/scripts/tmd_fit.py"
+  }
+}

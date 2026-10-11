@@ -1,0 +1,12 @@
+campaign,pass,n_train_labels,cum_label_core_h,cum_gpu_h_essential,cum_core_h_equiv,force_rmse_mev_ang,force_rmse_sigma_mev_ang,note
+fluoride,1,9,110.3,1.804,209.5,86.3,1.41,
+fluoride,2,16,196.2,3.62,395.3,72.62,0.95,
+fluoride,3,22,269.7,5.6,577.7,68.82,0.88,
+fluoride,4,28,343.3,7.56,759.1,65.62,0.79,
+fluoride,5,34,416.8,9.55,942.1,63.01,0.72,
+fluoride,6,44,539.4,11.525,1173.3,60.72,0.62,
+fluoride,7,54,662.0,13.521,1405.7,59.04,0.59,
+fluoride,8,64,784.6,15.55,1639.9,57.69,0.57,
+water,1,20,211.8,4.541,461.6,59.44,0.34,
+water,2,30,317.7,8.494,784.9,55.5,0.33,
+water,3,40,423.6,11.726,1068.5,51.4,0.37,validation ran outside the loop; imputed at the pass 1-2 mean

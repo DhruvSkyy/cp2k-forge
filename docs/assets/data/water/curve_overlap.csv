@@ -1,0 +1,7 @@
+n_labels,status,OO,OH,HH,three_pair_mean,goo_peak_r_ang,provenance,source
+20,collapsed,,,,,0.025,pass1,pass1_observables.npz
+30,collapsed,,,,,0.025,pass2,pass2_observables.npz
+40,scored,94.2,96.2,97.0,95.8,2.825,pass3 stress-free scratch (deployed),winner_observables_n40_pass3.npz
+70,scored,93.6,95.9,96.7,95.4,2.825,pass5,pass5_observables.npz
+80,scored,93.5,96.0,96.8,95.4,2.825,pass6,pass6_observables.npz
+90,scored,93.4,96.0,96.7,95.4,2.825,pass7 (converged),winner_observables.npz

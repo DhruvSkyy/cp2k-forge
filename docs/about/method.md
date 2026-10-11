@@ -29,12 +29,12 @@ so the simulated liquid evaporates and the density collapses.
 ## The loop
 
 ```
-        +------------ repeat ~4-5 passes until converged ------------+
+        +------------- repeat passes until converged ----------------+
         v                                                            |
  GENERATE --> SUBSAMPLE --> LABEL (DFT) --> TRAIN ------> converged? -+ --> SHOWCASE
- explorer     diversity     CP2K           fresh MACE      (no)            density
- MD           pick          revPBE-D3      from scratch                    isobar -> TMD
- (pass 1: foundation model + D3; pass >=2: the latest trained model)
+ explorer     select        CP2K, GGA      compact MACE    (no)            density
+ MD           decorrelated  or hybrid      on the labels                   isobar
+ (pass 1: foundation model + D3; pass >=2: the latest promoted model)
 ```
 
 Each pass explores configuration space, selects the most informative new structures,
@@ -54,7 +54,7 @@ and persists progress after each one.
 | Label     | `label.label_frames`, `cp2k_io`, `e0s`                | Writes a CP2K single-point input per structure (`cp2k_io.write_singlepoint_input`), runs CP2K, and parses the log (`cp2k_io.parse_singlepoint_output`). Isolated-atom reference energies (E0s) are computed once at the same level. |
 | Train     | `train.train_from_scratch`                            | Wraps `mace_run_train` to fit a fresh compact MACE (small `num_channels`/`max_ell`/`r_max` — the speed claim depends on this).                                                                                                      |
 | Validate  | `validate.validate_model`                             | Held-out force RMSE plus RDF/VDOS self-convergence scores, and an NPT density probe.                                                                                                                                                |
-| Showcase  | `showcase/run_isobar.py`, `showcase/density_tmd.py`   | Runs the 1 atm density isobar and locates the temperature of maximum density.                                                                                                                                                       |
+| Showcase  | `showcase/run_isobar.py`, `showcase/density_tmd.py`   | Runs the 1 atm density isobar and analyses the density-maximum region.                                                                                                                                                       |
 
 ### Data flow
 
@@ -69,7 +69,7 @@ Run state is a JSON state machine in `<workdir>/manifest.json` (`manifest.Manife
 DFT single point is keyed by a structure hash, so a labelled frame is never recomputed: a
 killed run resumes from exactly where it stopped. This makes the pipeline robust to job
 interruptions and lets the CPU-bound labelling stage be split from the GPU-bound training
-stage across separate jobs (`run.py --stop-after label`).
+stage across separate jobs (`cp2k-forge --stop-after label`).
 
 ## Verification
 
@@ -78,9 +78,9 @@ stage across separate jobs (`run.py --stop-after label`).
   forces. This is the unit-level guard on the whole labelling stage.
 - **Training quality** is reported every pass as the held-out force RMSE on a fixed DFT
   test set (a constant yardstick across passes).
-- **Physical fidelity** is the showcase: the density isobar must show a maximum, and the
-  temperature of maximum density must land in the window expected for the labelling
-  functional, with block-statistics error bars.
+- **Physical fidelity** is the showcase: the 1 atm density isobar with block-statistics
+  error bars, read against the labelling functional's own reference (never against
+  experiment — see the claim constraints in the Showcase guide).
 
 ## A physics caveat worth stating
 

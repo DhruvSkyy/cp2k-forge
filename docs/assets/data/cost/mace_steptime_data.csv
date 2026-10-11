@@ -1,0 +1,14 @@
+device,atoms,metatomic_s,metatomic_err_s,metatomic_err_kind,metatomic_n,symmetrix_s,symmetrix_err_s,symmetrix_err_kind,symmetrix_n
+gpu,192,0.0271,0.0015,between-run,5,0.0156,0.0002,between-run,5
+gpu,384,0.0414,0.0007,between-run,5,0.0222,0.0004,between-run,5
+gpu,768,0.0704,0.0002,between-run,5,0.0398,0.0015,between-run,5
+gpu,1536,0.1324,0.0003,between-run,5,0.0774,0.0021,between-run,5
+gpu,3072,0.2677,0.0053,between-run,5,0.1477,0.0037,between-run,5
+gpu,6144,0.5429,0.0164,between-run,5,0.2857,0.0055,between-run,5
+gpu,12288,,,,,0.5571,0.0074,between-run,5
+cpu,192,2.6539,0.0013,block,1,0.0332,0.0005,block,1
+cpu,384,5.3116,0.0028,block,1,0.0570,0.0015,block,1
+cpu,768,10.6350,0.0074,block,1,0.1009,0.0030,block,1
+cpu,1536,21.2281,0.0027,block,1,0.1814,0.0033,block,1
+cpu,3072,42.4674,,none,1,0.3457,,none,1
+cpu,6144,84.7876,,none,1,0.6915,,none,1

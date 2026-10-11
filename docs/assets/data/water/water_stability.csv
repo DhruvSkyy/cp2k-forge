@@ -1,0 +1,11 @@
+n_labels,min_oo_ang,force_score_pct,stable,label,source
+10,0.562,92.5,0,curve_n10,runs/water64_ambient/ablation_stability.json
+20,0.947,93.0,0,curve_n20,runs/water64_ambient/ablation_stability.json
+30,0.783,93.3,0,curve_n30,runs/water64_ambient/ablation_stability.json
+40,2.531,93.6,1,curve_n40,runs/water64_ambient/ablation_stability.json
+50,2.575,92.0,1,curve_n50,runs/water64_ambient/ablation_stability.json
+60,2.553,93.2,1,curve_n60,runs/water64_ambient/ablation_stability.json
+70,2.503,93.4,1,curve_n70,runs/water64_ambient/ablation_stability.json
+79,2.566,93.51,1,pass13,runs/water64_ambient/manifest.json (passes[].validation.stability)
+80,2.635,93.6,1,curve_n80,runs/water64_ambient/ablation_stability.json
+89,2.611,93.59,1,pass14,runs/water64_ambient/manifest.json (passes[].validation.stability)
