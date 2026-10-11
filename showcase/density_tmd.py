@@ -72,8 +72,11 @@ def locate_tmd(
         "tmd_k_std": float(tmds.std()) if tmds.size else float("nan"),
         "rho_max_gcc": rho_max,
         "n_points": int(len(temps)),
+        # Kept in the result dict for downstream opt-in overlays only; the default
+        # report compares against the functional's own literature value. A classical-
+        # nuclei simulation should NOT be scored against experiment (error cancellation).
         "experiment_tmd_k": 277.13,
-        "revpbe_d3_literature_tmd_k": "~299-308",
+        "revpbe_d3_literature_tmd_k": "~308",
     }
 
 
@@ -85,7 +88,6 @@ def main():
     res = locate_tmd(args.isobar_tsv, window=args.window)
     print(f"TMD            : {res['tmd_k']:.1f} +/- {res['tmd_k_std']:.1f} K")
     print(f"max density    : {res['rho_max_gcc']:.4f} g/cm^3")
-    print(f"experiment     : {res['experiment_tmd_k']} K")
     print(f"revPBE-D3 lit. : {res['revpbe_d3_literature_tmd_k']} K")
 
 

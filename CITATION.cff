@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "CP2K-FORGE"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Sharma
+    given-names: Dhruv
+    affiliation: "University of Cambridge"
+abstract: >-
+  CP2K-FORGE (Foundation-model Optimisation of Reference Generation and
+  Evaluation in CP2K) forges compact, system-specific MACE interatomic
+  potentials: a MACE foundation model proposes configurations, CP2K labels
+  them with DFT single points (semi-local or hybrid revPBE0-D3/ADMM), and a
+  small MACE is trained from scratch on those labels, iterating under
+  force-accuracy and own-MD stability gates until a pre-registered
+  convergence rule fires. Developed for the MPhil report "Machine-Learned
+  Interatomic Potentials in CP2K with GPU Acceleration, MACE Integration and
+  CP2K-FORGE for Domain-Specific Models" (University of Cambridge, 2026).
+keywords:
+  - machine-learned interatomic potentials
+  - CP2K
+  - MACE
+  - active learning
+  - molecular dynamics
+license: MIT
+repository-code: "https://github.com/DhruvSkyy/cp2k-forge"
+version: "0.1.0"
+date-released: 2026-10-10

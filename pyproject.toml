@@ -33,6 +33,10 @@ train = [
     "torch-dftd",
 ]
 plot = ["matplotlib"]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+]
 
 [project.scripts]
 cp2k-forge = "cp2k_forge.cli:main"

@@ -1,30 +1,54 @@
 # CP2K-FORGE
 
-Forge a small, fast, **system-specific** [MACE](https://github.com/ACEsuit/mace)
-potential from a MACE foundation model, with [CP2K](https://www.cp2k.org) as the DFT
-labelling engine. The foundation model is used **only as a structure generator**; the
-physics comes entirely from DFT single points computed by CP2K.
+**CP2K-FORGE** (*Foundation-model Optimisation of Reference Generation and Evaluation
+in CP2K*) forges a small, fast, **system-specific**
+[MACE](https://github.com/ACEsuit/mace) potential from a MACE foundation model, with
+[CP2K](https://www.cp2k.org) as the DFT labelling engine. The foundation model is used
+**only as a structure generator**; the physics comes entirely from DFT single points
+computed by CP2K — semi-local GGA out of the box, or hybrid revPBE0-D3 under ADMM
+(`dft.mode: hybrid`). Pure Python 3.9+; CP2K is a runtime dependency, executed as a
+subprocess and never linked.
 
 ```
-        +------------ repeat ~4-5 passes until converged ------------+
+        +------------- repeat passes until converged ----------------+
         v                                                            |
  GENERATE --> SUBSAMPLE --> LABEL (DFT) --> TRAIN ------> converged? -+ --> SHOWCASE
- explorer     diversity     CP2K           fresh MACE      (no)            density
- MD           pick          revPBE-D3      from scratch                    isobar -> TMD
- (pass 1: MACE-MP-0+D3; pass >=2: the latest trained model)
+ explorer     select        CP2K, GGA      compact MACE    (no)            density
+ MD           decorrelated  or hybrid      on the labels                   isobar
+ (pass 1: foundation model + D3; pass >=2: the latest promoted model)
 ```
 
-First showcase: liquid water's **temperature of maximum density** (TMD, experiment ~277 K).
+Validated on two systems at hybrid revPBE0-D3 against a published committee potential:
+ambient water (**89 labels** vs the committee's 814; force RMSE **53.3 vs 64.6 meV/Å**
+on shared frames) and aqueous fluoride (**64 vs 299 labels; 57.7 vs 69.4 meV/Å**), both
+campaigns stopped by a pre-registered convergence rule. Full numbers, figures and raw
+data: the **Case studies** section of the documentation.
+
+## Documentation
+
+In-depth docs ship with the repo as an MkDocs Material site:
+
+```
+pip install -e ".[docs]"
+mkdocs serve        # then open http://127.0.0.1:8000
+```
+
+(The `docs-deploy` workflow publishes it to GitHub Pages on demand once the repository
+is public.) Start with *Getting started → CP2K as a dependency* for exactly how the
+CP2K coupling works, and *Case studies* for the validated campaigns.
 
 ## What this is — and is not
 
-- **Foundation model = sampler only.** Run MD with MACE-MP-0+D3 to generate diverse,
-  physically-sensible structures. Keep the structures, discard its energies.
-- **Labels = real DFT.** Every training structure gets a revPBE-D3 single point in CP2K.
-- **Model = trained from scratch.** A fresh, compact MACE learns only from the DFT labels,
-  so its physics is purely the labelling functional (clean revPBE-D3 provenance).
+- **Foundation model = sampler only.** Run MD with a foundation model (plus D3 where
+  the system needs it) to generate diverse, physically-sensible structures. Keep the
+  structures, discard its energies.
+- **Labels = real DFT.** Every training structure gets a CP2K single point at your
+  chosen level — e.g. revPBE-D3, or hybrid revPBE0-D3 via `dft.mode: hybrid`.
+- **Model = trained from scratch.** A fresh, compact MACE learns only from the DFT
+  labels, so its physics is purely the labelling functional.
 - **NOT distillation** (the foundation model never labels), **NOT fine-tuning** (no
-  inherited weights), **NOT query-by-committee** (selection is diversity sampling).
+  inherited weights), **NOT query-by-committee** (the default selector draws random
+  time-decorrelated frames).
 
 The D3 correction on the generator is **mandatory for water** — raw MACE-MP-0 has no
 dispersion and the liquid evaporates (density collapses to ~0.72 g/cm^3).
@@ -66,7 +90,7 @@ on a laptop or any cluster:
 | variable             | purpose                                                                                                                                             |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CP2K_BIN`           | path to the CP2K binary used for DFT labelling (default: `dft.cp2k_bin`, i.e. `cp2k.psmp` on PATH)                                                 |
-| `CP2K_DATA_DIR`      | directory with `BASIS_MOLOPT`, `GTH_POTENTIALS`, `dftd3.dat`; may stay **unset** for a standard install — it is derived from the binary's location |
+| `CP2K_DATA_DIR`      | directory with `BASIS_MOLOPT`, `GTH_POTENTIALS`, `dftd3.dat` (plus `BASIS_ADMM`, `t_c_g.dat` for `dft.mode: hybrid`); may stay **unset** for a standard install — it is derived from the binary's location |
 | `CP2K_MPI_LAUNCHER`  | `mpirun` (default) or `none` for an OMP-only (`.ssmp`) build                                                                                        |
 | `CP2K_RANKS`         | MPI ranks per DFT single point                                                                                                                      |
 | `CP2K_OMP_THREADS`   | OMP threads per rank (default: auto from the allocated cores)                                                                                       |
@@ -115,33 +139,37 @@ cp2k-forge --config configs/water.yaml \
 src/cp2k_forge/     core library: units, config, dataset, manifest, seed, cp2k_env,
                     cp2k_io, label, e0s, generate, subsample, direct, decorrelation,
                     train, engines, validate, report, doctor, cli
-  templates/        dft_singlepoint.inp (DFT labelling), dft_atom.inp (E0s),
-                    aimd_reference.inp, md_backend.inp (optional in-CP2K-backend MD)
-configs/water.yaml  the one file to edit to retarget a campaign
-configs/smoke.yaml  no-CP2K, no-GPU install self-test
-examples/           water32.xyz seed structure for the example configs
+  templates/        dft_singlepoint[_hybrid].inp (labelling), dft_atom[_hybrid].inp
+                    (E0s), aimd_reference.inp, md_backend.inp (optional in-CP2K MD)
+configs/            water.yaml (revPBE-D3), water_hybrid.yaml (revPBE0-D3/ADMM),
+                    smoke.yaml (no-CP2K, no-GPU install self-test)
+examples/           water32.xyz + water64.xyz seed structures
 showcase/           run_isobar.py, density_tmd.py, plot_tmd.py, bench_throughput.py
-tests/              torch-free parser round-trip regression test
-docs/method.md      design rationale, stage-by-stage data flow, physics caveats
+tests/              torch-free parser + input-render regression tests
+docs/               the MkDocs site (mkdocs serve); case studies with report data
 example_job.sh      generic, scheduler-agnostic batch-job template
 ```
 
-## Config knobs (configs/water.yaml)
+## Config knobs (configs/*.yaml)
 
 DFT functional + basis/pseudo/cutoff, the explore temperature/density grid, the compact
 model size (`num_channels`, `max_ell`, `r_max`, `num_interactions`), frames per pass, and
-the convergence tolerances (force-RMSE plateau + density movement). Swap `dft.functional`
-to `revPBE0`/`SCAN` to relabel at a different level. Relative input paths in a config
-resolve from the config file's directory, so a config travels with the files it names.
+the convergence tolerances (force-RMSE plateau + density movement). Set
+`dft.mode: hybrid` for revPBE0-D3 labelling (ADMM + truncated Coulomb; see
+`configs/water_hybrid.yaml` and the Hybrid DFT docs page). Relative input paths in a
+config resolve from the config file's directory, so a config travels with the files it
+names.
 
 ## Verification gates
 
 - **Labelling:** `cp2k_forge.cp2k_io.parse_singlepoint_output` round-trips a known CP2K
   log to the right energy/forces; unit conversions live solely in `cp2k_forge/units.py`.
-  A fast, torch-free regression test covers this parser.
-- **Training:** held-out force RMSE reported each pass (target < ~40 meV/Angstrom).
-- **Showcase:** density(T) shows a maximum; the TMD lands in the revPBE-D3 window with
-  block-statistics error bars.
+  A fast, torch-free regression test covers this parser, and golden-fixture tests lock
+  the GGA input render byte-for-byte.
+- **Training:** held-out force RMSE reported each pass against a frozen test set.
+- **Showcase:** the 1 atm density isobar with block-statistics error bars, read against
+  the labelling functional's own reference (density claim language follows the docs'
+  Showcase page).
 
 ## Optional: the in-CP2K MACE backend (throughput showcase)
 
@@ -158,8 +186,9 @@ binary) and `SYMMETRIX_EXTRACT_SRC` (the model-to-JSON exporter).
 
 ## Method and implementation notes
 
-See [docs/method.md](docs/method.md) for the design rationale, the stage-by-stage data
-flow (which module owns which stage), and the known physics caveats.
+See [docs/about/method.md](docs/about/method.md) for the design rationale, the
+stage-by-stage data flow (which module owns which stage), and the known physics caveats
+— or the same page rendered in the documentation site.
 
 ## Provenance
 

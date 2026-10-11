@@ -1,9 +1,27 @@
 # Changelog
 
-## 0.1.0 (2026-10-06)
+## 0.1.0 (2026-10-10)
 
 First standalone release, extracted from the `tools/mace-distill` directory of the
 cp2k-mlp development fork (branch `mace-distill-pipeline`).
+
+- Hybrid revPBE0-D3 labelling path: `dft.mode: hybrid` renders ADMM + truncated-Coulomb
+  HFX inputs (two new package templates), with legality guards at config load and per
+  labelled frame; the GGA default stays byte-identical, locked by golden-fixture tests.
+  `configs/water_hybrid.yaml` carries the production level on the shipped
+  `examples/water64.xyz` seed. The doctor's data check adds `BASIS_ADMM` + `t_c_g.dat`
+  conditional on the mode.
+- Documentation site (MkDocs Material, `mkdocs serve`, strict-built in CI, dispatch-gated
+  Pages deploy): getting-started, full configuration reference, hybrid-DFT guide,
+  validation/convergence methodology, HPC guide, troubleshooting, CLI and API reference,
+  and case studies reproducing the report's water and fluoride campaigns with vendored
+  figures and raw data (CC BY 4.0, `docs/assets/README.md` manifest). `CITATION.cff`
+  added.
+- Showcase claim hygiene: the experimental 277 K overlay in `plot_tmd.py` is opt-in
+  (`--mark-expt`), and `density_tmd.py` reports against the functional's own literature
+  value by default.
+- Release asset: `water64_pass6_stagetwo.model`, the final model of the semi-local
+  `water64_tmd` campaign (see the docs' provenance page for its honest caveats).
 
 - Renamed throughout: package `macedistill` -> `cp2k_forge`, pip name `cp2k-forge`,
   CLI `cp2k-forge` (was `python -m run`), environment variables

@@ -1,5 +1,5 @@
-# Campaign: a domain-specific MACE for bulk liquid water at the revPBE-D3 level,
-# validated by its temperature of maximum density (TMD, experiment ~277 K).
+# Campaign: a domain-specific MACE for bulk liquid water at the semi-local revPBE-D3
+# level, with the 1 atm density isobar as the showcase observable.
 #
 # Edit this one file to retarget the pipeline: DFT level, explore grid, model size,
 # convergence. This example is machine-agnostic. The CP2K binary, its data files, and

@@ -1,7 +1,9 @@
 """Plot the density isobar with its fitted temperature of maximum density.
 
 Paper style: serif (Computer Modern), dashed grid, density on the y-axis in g/cm^3
-(never inverted). Marks the fitted TMD and the experimental 277 K reference.
+(never inverted). Marks the fitted TMD; the experimental 277 K line is drawn only
+with --mark-expt, because a classical-nuclei simulation at a given functional should
+be read against that functional's own reference, not against experiment.
 """
 
 from __future__ import annotations
@@ -26,7 +28,7 @@ def _paper_style(ax):
     ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
 
 
-def plot(isobar_tsv: str, out_path: str, window: float = 40.0):
+def plot(isobar_tsv: str, out_path: str, window: float = 40.0, mark_expt: bool = False):
     import matplotlib.pyplot as plt
     import numpy as np
 
@@ -56,13 +58,14 @@ def plot(isobar_tsv: str, out_path: str, window: float = 40.0):
 
     tmd = res["tmd_k"]
     ax.axvline(tmd, ls=":", color="#b22222", lw=1.2, label=f"TMD = {tmd:.0f} K")
-    ax.axvline(
-        res["experiment_tmd_k"],
-        ls="--",
-        color="grey",
-        lw=1.0,
-        label=f"experiment = {res['experiment_tmd_k']:.0f} K",
-    )
+    if mark_expt:
+        ax.axvline(
+            res["experiment_tmd_k"],
+            ls="--",
+            color="grey",
+            lw=1.0,
+            label=f"experiment = {res['experiment_tmd_k']:.0f} K",
+        )
 
     ax.set_xlabel("temperature (K)")
     ax.set_ylabel(r"density (g\,cm$^{-3}$)")
@@ -80,8 +83,14 @@ def main():
     ap.add_argument("isobar_tsv")
     ap.add_argument("--out", default="runs/water/tmd.png")
     ap.add_argument("--window", type=float, default=40.0)
+    ap.add_argument(
+        "--mark-expt",
+        action="store_true",
+        help="also draw the experimental 277 K line (off by default; a classical-"
+        "nuclei model is read against its functional's reference, not experiment)",
+    )
     args = ap.parse_args()
-    plot(args.isobar_tsv, args.out, args.window)
+    plot(args.isobar_tsv, args.out, args.window, mark_expt=args.mark_expt)
 
 
 if __name__ == "__main__":
