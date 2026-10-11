@@ -21,3 +21,10 @@ Modules:
     subsample  diversity-based frame selection
     train      mace-torch from-scratch training wrapper
 """
+
+from importlib.metadata import PackageNotFoundError, version as _dist_version
+
+try:
+    __version__ = _dist_version("cp2k-forge")
+except PackageNotFoundError:  # a bare checkout on sys.path without an install
+    __version__ = "0+unknown"

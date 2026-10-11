@@ -72,6 +72,15 @@ loudly. For early passes on tiny datasets, `train.pair_repulsion: true` (ZBL) gu
 the short-range repulsion the data cannot teach; for water, make sure the foundation
 sampler has dispersion (`generator.dispersion: true`) or the liquid evaporates.
 
+**Every D3 run segfaults immediately (signal 11, right after the Quickstep banner).**
+Some source builds ship a broken DFTD3 module while everything else works; the input
+even passes `cp2k.psmp --check`. Confirm with a 3-atom single point: it will run clean,
+then crash the moment a `&VDW_POTENTIAL ... TYPE DFTD3` block is added. The fix is a
+CP2K build/packaged binary with a working D3 (this is a CP2K build defect, not an input
+problem). To keep working at a dispersion-free level in the meantime, set
+`dft.vdw: none` — and remember that for water the *generator* still needs its
+dispersion (`generator.dispersion: true` is torch-side D3, unaffected).
+
 **Resume did not resume.** The manifest lives in the workdir — the same `--workdir` /
 `CP2K_FORGE_WORKDIR` must be passed again. Labels are keyed by structure hash, so even a
 deleted manifest only costs bookkeeping, never finished DFT.

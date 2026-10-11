@@ -53,6 +53,7 @@ pass through unchanged.
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `functional` | `revPBE` | XC functional (CP2K `PARAMETRIZATION` token) |
+| `vdw` | `dftd3` | `dftd3` renders the D3 pair potential; `none` strips the vdW section for a dispersion-free labelling level (the two D3 knobs below then do nothing) |
 | `dispersion_ref` | `revPBE` | `REFERENCE_FUNCTIONAL` for the D3 correction — for `mode: hybrid` set this to the **hybrid** name (e.g. `revPBE0`), not the GGA base |
 | `d3_damping` | `zero` | `zero` (DFTD3) or `bj`. For water/revPBE, zero damping is correct; BJ inverts the ice/water density order |
 | `cutoff_ry`, `rel_cutoff_ry` | 400, 50 | plane-wave cutoffs (Ry) |

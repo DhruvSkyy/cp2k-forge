@@ -1,5 +1,9 @@
 # CP2K-FORGE
 
+[![ci](https://github.com/DhruvSkyy/cp2k-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/DhruvSkyy/cp2k-forge/actions/workflows/ci.yml)
+![python](https://img.shields.io/badge/python-3.9%2B-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+
 **CP2K-FORGE** (*Foundation-model Optimisation of Reference Generation and Evaluation
 in CP2K*) forges a small, fast, **system-specific**
 [MACE](https://github.com/ACEsuit/mace) potential from a MACE foundation model, with
@@ -183,6 +187,18 @@ path (`generator.engine: cp2k-backend`, the `md_backend.inp` template,
 separate contribution. Selecting it without that build raises a clear, actionable error
 rather than failing obscurely. It adds `CP2K_BACKEND_BIN` (the metatomic-enabled CP2K
 binary) and `SYMMETRIX_EXTRACT_SRC` (the model-to-JSON exporter).
+
+## Development
+
+```
+pip install -e ".[train,plot,docs]" pytest black
+pytest                 # torch-free unit tests (parser round-trip, input renders)
+black .                # the repo is black-formatted; CI checks it
+mkdocs serve           # the documentation site at http://127.0.0.1:8000
+cp2k-forge --config configs/smoke.yaml   # mock end-to-end self-test (no CP2K/GPU)
+```
+
+CI runs the tests on Python 3.10/3.12 plus a strict docs build on every push.
 
 ## Method and implementation notes
 

@@ -38,6 +38,11 @@ docs = [
     "mkdocstrings[python]>=0.24",
 ]
 
+[project.urls]
+Repository = "https://github.com/DhruvSkyy/cp2k-forge"
+Documentation = "https://github.com/DhruvSkyy/cp2k-forge/tree/main/docs"
+Changelog = "https://github.com/DhruvSkyy/cp2k-forge/blob/main/CHANGELOG.md"
+
 [project.scripts]
 cp2k-forge = "cp2k_forge.cli:main"
 

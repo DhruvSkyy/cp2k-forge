@@ -447,7 +447,10 @@ def run(
 
 
 def main():
+    from . import __version__
+
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--version", action="version", version=f"cp2k-forge {__version__}")
     ap.add_argument("--config", default=None, help="path to the campaign YAML")
     ap.add_argument(
         "--check",

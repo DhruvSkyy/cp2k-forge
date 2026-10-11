@@ -113,6 +113,18 @@ def test_hfx_radius_guard_config_level():
         cfg.validate()
 
 
+def test_vdw_none_strips_dispersion(tmp_path):
+    for dft in (DFTConfig(vdw="none"), _hybrid_dft(vdw="none")):
+        atoms = _water64() if dft.mode == "hybrid" else _water32()
+        text = cp2k_io.write_singlepoint_input(
+            atoms, dft, "nod3", tmp_path / f"{dft.mode}.inp"
+        ).read_text()
+        assert "VDW_POTENTIAL" not in text
+        assert "DFTD3" not in text
+        # The surrounding XC section must survive the strip intact.
+        assert "&XC" in text and "&END XC" in text
+
+
 def test_water_hybrid_config_loads():
     cfg = Config.from_yaml(str(REPO_ROOT / "configs" / "water_hybrid.yaml"))
     assert cfg.dft.mode == "hybrid"

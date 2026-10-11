@@ -84,6 +84,28 @@ def _hybrid_format_args(dft) -> dict:
     )
 
 
+def _strip_vdw(text: str, dft) -> str:
+    """Remove the vdW section for a dispersion-free level (dft.vdw == "none").
+
+    The templates carry the D3 block by default, so the default rendering stays
+    byte-identical; stripping the block afterwards keeps one template per level
+    instead of a template per (level, dispersion) combination."""
+    if getattr(dft, "vdw", "dftd3") != "none":
+        return text
+    lines = text.splitlines(keepends=True)
+    out, skipping = [], False
+    for line in lines:
+        if "&VDW_POTENTIAL" in line and "&END" not in line:
+            skipping = True
+            continue
+        if skipping:
+            if "&END VDW_POTENTIAL" in line:
+                skipping = False
+            continue
+        out.append(line)
+    return "".join(out)
+
+
 def _inject_charge(text: str, charge: int) -> str:
     """Post-process CHARGE into a rendered GGA input (for a charged box).
     charge == 0 returns the text unchanged, keeping the GGA path byte-identical."""
@@ -136,6 +158,7 @@ def write_singlepoint_input(atoms, dft, project: str, out_path: str | Path) -> P
             kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
         )
         text = _inject_charge(text, int(getattr(dft, "charge", 0)))
+    text = _strip_vdw(text, dft)
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text)
@@ -192,6 +215,7 @@ def write_atom_input(
             **common,
             kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
         )
+    text = _strip_vdw(text, dft)
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text)
@@ -252,6 +276,7 @@ def write_aimd_input(
         kind_blocks=_kind_blocks(elements, dft.basis_set, dft.potential),
         ext_restart=ext_restart,
     )
+    text = _strip_vdw(text, dft)
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text)

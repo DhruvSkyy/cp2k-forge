@@ -17,6 +17,10 @@ cp2k-mlp development fork (branch `mace-distill-pipeline`).
   and case studies reproducing the report's water and fluoride campaigns with vendored
   figures and raw data (CC BY 4.0, `docs/assets/README.md` manifest). `CITATION.cff`
   added.
+- `dft.vdw: dftd3 | none` — dispersion-free labelling levels are now expressible (the
+  vdW section is stripped from all rendered inputs); the default rendering is unchanged.
+- `cp2k-forge --version`, `cp2k_forge.__version__`, and the package version in the
+  doctor header; `[project.urls]` in the package metadata.
 - Showcase claim hygiene: the experimental 277 K overlay in `plot_tmd.py` is opt-in
   (`--mark-expt`), and `density_tmd.py` reports against the functional's own literature
   value by default.

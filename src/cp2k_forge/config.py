@@ -24,6 +24,9 @@ class SystemConfig:
 @dataclass
 class DFTConfig:
     functional: str = "revPBE"  # XC functional for labelling
+    vdw: str = "dftd3"  # "dftd3" renders the D3 pair potential (the two knobs
+    # below apply); "none" strips the vdW section for a
+    # dispersion-free labelling level
     dispersion_ref: str = "revPBE"  # REFERENCE_FUNCTIONAL for the D3 correction
     d3_damping: str = "zero"  # "zero" (DFTD3) or "bj" (DFTD3(BJ)). For water/revPBE,
     # zero-damping is correct; BJ inverts the ice/water
@@ -477,6 +480,8 @@ class Config:
             raise ValueError("dft.backend must be 'cp2k' or 'mock_foundation'")
         if self.dft.mode not in ("gga", "hybrid"):
             raise ValueError("dft.mode must be 'gga' or 'hybrid'")
+        if self.dft.vdw not in ("dftd3", "none"):
+            raise ValueError("dft.vdw must be 'dftd3' or 'none'")
         if self.dft.mode == "hybrid":
             # Truncated-Coulomb legality: the HFX cutoff radius must fit inside the
             # minimum image of every cell that will ever be labelled. Two checks:

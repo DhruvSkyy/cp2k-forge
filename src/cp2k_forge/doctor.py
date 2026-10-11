@@ -310,9 +310,11 @@ def run_checks(
 
 def print_report(checks: list[Check]) -> bool:
     """Print the checks as a table. Returns True if there are no FAILs."""
+    from . import __version__
+
     symbol = {"PASS": "ok  ", "WARN": "warn", "FAIL": "FAIL", "SKIP": "skip"}
     width = max((len(c.name) for c in checks), default=4)
-    print("\ncp2k-forge preflight")
+    print(f"\ncp2k-forge {__version__} preflight")
     print("-" * (width + 8))
     ok = True
     for c in checks:
