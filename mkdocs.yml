@@ -1,5 +1,6 @@
 site_name: CP2K-FORGE
 site_description: Forge compact system-specific MACE potentials with CP2K as the DFT labelling engine
+site_url: https://www.dhruvs.com/cp2k-forge/
 repo_url: https://github.com/DhruvSkyy/cp2k-forge
 repo_name: DhruvSkyy/cp2k-forge
 edit_uri: ""

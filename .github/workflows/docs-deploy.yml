@@ -1,9 +1,8 @@
 # Deploy the documentation site to GitHub Pages, on demand.
 #
-# Dispatch-gated on purpose: while the repository is private, a Pages deploy either
-# fails (free plan) or publishes the site publicly (paid plan). Run this workflow from
-# the Actions tab once the repository is public (enable Pages with source
-# "GitHub Actions" in Settings first).
+# Dispatch-gated on purpose: the repository is public and Pages is live at
+# https://www.dhruvs.com/cp2k-forge/, but docs only redeploy when explicitly
+# triggered (Actions tab -> docs-deploy -> Run workflow), not on every push.
 name: docs-deploy
 
 on:

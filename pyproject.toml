@@ -40,7 +40,7 @@ docs = [
 
 [project.urls]
 Repository = "https://github.com/DhruvSkyy/cp2k-forge"
-Documentation = "https://github.com/DhruvSkyy/cp2k-forge/tree/main/docs"
+Documentation = "https://www.dhruvs.com/cp2k-forge/"
 Changelog = "https://github.com/DhruvSkyy/cp2k-forge/blob/main/CHANGELOG.md"
 
 [project.scripts]

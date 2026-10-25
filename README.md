@@ -30,16 +30,17 @@ data: the **Case studies** section of the documentation.
 
 ## Documentation
 
-In-depth docs ship with the repo as an MkDocs Material site:
+**Live:** **https://www.dhruvs.com/cp2k-forge/**
+
+Or build it locally (same MkDocs Material site):
 
 ```
 pip install -e ".[docs]"
 mkdocs serve        # then open http://127.0.0.1:8000
 ```
 
-(The `docs-deploy` workflow publishes it to GitHub Pages on demand once the repository
-is public.) Start with *Getting started → CP2K as a dependency* for exactly how the
-CP2K coupling works, and *Case studies* for the validated campaigns.
+Start with *Getting started → CP2K as a dependency* for exactly how the CP2K coupling
+works, and *Case studies* for the validated campaigns.
 
 ## What this is — and is not
 
