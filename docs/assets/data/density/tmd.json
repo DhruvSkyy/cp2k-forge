@@ -114,7 +114,7 @@
     "adopted": "champion-only bootstrap window below; 3-model range kept as seed sensitivity"
   },
   "provenance": {
-    "csv": "/rds/user/ds2173/hpc-work/cp2k-mlp-density/dev/mace_distill/results_rho_t.csv",
+    "csv": "<hpc-work>/cp2k-mlp-density/dev/mace_distill/results_rho_t.csv",
     "B": 10000,
     "seed": 0,
     "script": "dev/mace_distill/scripts/tmd_fit.py"

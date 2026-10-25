@@ -6,8 +6,9 @@ Potentials in CP2K", v1.1, 2026-08-13) and its rendered figures. They are **neve
 regenerated here** — the package's `scripts/` directory holds the generators, and every
 CSV row carries a `source` column pointing at the raw run directory it came from.
 
-**License:** figures and data © 2026 Dhruv Sharma, CC BY 4.0 (the data package's
-`LICENSE-DATA`). The code in this repository is MIT; the CC BY 4.0 terms apply only to
+**License:** figures and data © 2026 Dhruv Sharma, licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (the licence the original
+data package carries). The code in this repository is MIT; the CC BY 4.0 terms apply only to
 the files under `docs/assets/`.
 
 | File | Source in the data package | Feeds |
