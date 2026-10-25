@@ -1,0 +1,13 @@
+series,label,core_eq,katom_step_per_s,err_katom_step_per_s,err_kind,n
+cpu,CPU (codeopt FP64),55,58.4226,6.0650,between-run,5
+cpu,CPU (codeopt FP64),110,84.9638,1.4023,between-run,5
+cpu,CPU (codeopt FP64),165,106.5907,0.3009,between-run,5
+cpu,CPU (codeopt FP64),220,119.5701,0.2840,between-run,5
+gpu_double,A100 GPU (DOUBLE FP64),55,91.2831,0.4129,between-run,5
+gpu_double,A100 GPU (DOUBLE FP64),110,138.7191,0.9109,between-run,5
+gpu_double,A100 GPU (DOUBLE FP64),165,179.6186,4.4902,between-run,5
+gpu_double,A100 GPU (DOUBLE FP64),220,207.3506,1.4891,between-run,5
+gpu_mixed,A100 GPU (MIXED FP32),55,142.7587,0.6643,between-run,5
+gpu_mixed,A100 GPU (MIXED FP32),110,192.8173,2.7435,between-run,5
+gpu_mixed,A100 GPU (MIXED FP32),165,231.2625,0.8557,between-run,5
+gpu_mixed,A100 GPU (MIXED FP32),220,260.2792,2.7006,between-run,5

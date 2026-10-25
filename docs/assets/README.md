@@ -24,6 +24,8 @@ the files under `docs/assets/`.
 | `figures/fig_scorecard.png` | draft figure kept with the package scripts | Cost page: Schran-style score bars (orphaned draft, kept for talks) |
 | `figures/fig_water_density_isobar.png` | `figures_rendered/appendix/` | Density page: equilibrium density vs temperature, own-DFT reference band only |
 | `figures/fig_systems.png` | `figures_rendered/ch4/` | Case-studies index: the two simulation cells |
+| `figures/fig_gpu_isocost.png` | `figures_rendered/ch4/` | Provenance "Why this exists": GPU HDNNP iso-cost throughput (H2O-16384, 1-4 A100s vs CPU core-equivalents) |
+| `figures/fig_mace_steptime.png` | `figures_rendered/ch4/` | Provenance "Why this exists": MACE backend step time, metatomic vs Symmetrix, GPU and CPU panels |
 | `data/water/water_learning_curve.csv` | `data/aggregated/hybrid/water_ambient/` | Water learning curve (deployed / invalid / cold-curve roles) |
 | `data/water/water_stability.csv` | `data/aggregated/hybrid/water_ambient/` | Water stability screens (min O–O per model) |
 | `data/water/water_ambient_audit.csv` | `data/aggregated/hybrid/water/` | v2-campaign audit on the pre-registered ambient ruler |
@@ -34,7 +36,8 @@ the files under `docs/assets/`.
 | `data/fluoride/species_by_pass.json` | `data/aggregated/hybrid/fluoride/` | Per-species force RMSE by pass |
 | `data/fluoride/coordination_scores.json` | `data/aggregated/hybrid/fluoride/` | F coordination numbers vs AIMD/committee |
 | `data/cost/forge_cost_curve.csv` | `data/aggregated/` | Accuracy-vs-cost curve (see caveat above) |
-| `data/cost/mace_steptime_data.csv` | `data/aggregated/` | Backend step-time measurements |
+| `data/cost/mace_steptime_data.csv` | `data/aggregated/` | Backend step-time measurements (feeds `fig_mace_steptime.png`) |
 | `data/cost/backends_table_data.csv` | `data/aggregated/` | Backend comparison table data |
+| `data/cost/gpu_isocost_data.csv` | `data/aggregated/` | GPU/CPU iso-cost throughput measurements (feeds `fig_gpu_isocost.png`) |
 | `data/density/results_rho_t.csv` | `data/aggregated/rhoT/` | All 49 barostat-free NVT P(rho)=0 crossings |
 | `data/density/tmd.json` | `data/aggregated/rhoT/` | Density-maximum fit record — its verdict field is the authority on what may be claimed (UNRESOLVED) |

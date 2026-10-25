@@ -58,6 +58,16 @@ Full numbers, figures and the raw data files are in the
 [case studies](case-studies/index.md); every value links back to the report section and
 the vendored CSV it comes from.
 
+## Why this exists
+
+CP2K-FORGE is the capstone of a research arc, not a standalone tool: optimise CP2K's
+native neural-network potential evaluator on CPU (accepted upstream into CP2K), move
+it to GPU, extend CP2K to MACE through two backends — and only then ask whether CP2K
+can build a compact model as well as run it. See
+[Provenance → Why this exists](about/provenance.md#why-this-exists) for the full
+chronology, with the GPU throughput and backend step-time figures that motivated it,
+and where, how and by whom CP2K-FORGE was developed.
+
 ## What is it written in?
 
 Pure **Python** (3.9+), published as the `cp2k-forge` package. It orchestrates two
