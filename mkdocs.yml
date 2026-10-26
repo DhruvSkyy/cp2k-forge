@@ -14,20 +14,9 @@ theme:
     text: IBM Plex Sans
     code: IBM Plex Mono
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/weather-night
-        name: Dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/weather-sunny
-        name: Light mode
+    scheme: default
+    primary: custom
+    accent: custom
   features:
     - announce.dismiss
     - navigation.tabs
