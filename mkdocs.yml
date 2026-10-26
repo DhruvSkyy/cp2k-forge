@@ -1,4 +1,4 @@
-site_name: CP2K-FORGE documentation
+site_name: CP2K-FORGE
 site_description: Build compact, DFT-labelled MACE potentials and verify them in CP2K before deployment.
 site_url: https://www.dhruvs.com/cp2k-forge/
 repo_url: https://github.com/DhruvSkyy/cp2k-forge
@@ -14,12 +14,22 @@ theme:
     text: IBM Plex Sans
     code: IBM Plex Mono
   palette:
-    scheme: default
-    primary: custom
-    accent: custom
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Use dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Use light mode
   features:
     - announce.dismiss
-    - navigation.tabs
     - navigation.sections
     - navigation.indexes
     - navigation.top
