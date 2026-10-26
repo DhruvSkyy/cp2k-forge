@@ -1,5 +1,5 @@
 site_name: CP2K-FORGE
-site_description: Forge compact system-specific MACE potentials with CP2K as the DFT labelling engine
+site_description: Build compact, DFT-labelled MACE potentials and verify them in CP2K before deployment.
 site_url: https://www.dhruvs.com/cp2k-forge/
 repo_url: https://github.com/DhruvSkyy/cp2k-forge
 repo_name: DhruvSkyy/cp2k-forge
@@ -8,22 +8,28 @@ strict: true
 
 theme:
   name: material
+  logo: assets/brand/forge-mark.svg
+  favicon: assets/brand/forge-mark.svg
+  font:
+    text: IBM Plex Sans
+    code: IBM Plex Mono
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: teal
-      accent: deep orange
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-night
         name: Dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: teal
-      accent: deep orange
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-sunny
         name: Light mode
   features:
+    - announce.dismiss
     - navigation.tabs
     - navigation.sections
     - navigation.indexes
@@ -33,6 +39,18 @@ theme:
     - search.highlight
     - content.code.copy
     - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/site.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/DhruvSkyy/cp2k-forge
+      name: CP2K-FORGE on GitHub
 
 markdown_extensions:
   - admonition
