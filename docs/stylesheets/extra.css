@@ -81,9 +81,11 @@ body { letter-spacing: 0; }
 .project-meta > *:not(:last-child)::after { content: "·"; margin-left: 1rem; color: #9aa4a0; }
 .research-hero__figure { margin: 0; }
 .research-hero__figure img { display: block; width: 100%; mix-blend-mode: multiply; }
-[data-md-color-scheme="slate"] .research-hero__figure { padding: 0.65rem; border: 1px solid var(--line); background: #f8f8f8; }
-[data-md-color-scheme="slate"] .research-hero__figure img { mix-blend-mode: normal; }
-[data-md-color-scheme="slate"] .research-hero__figure figcaption { color: #5f666c; }
+[data-md-color-scheme="slate"] .md-typeset img[src*="figures/"] {
+  background: transparent;
+  filter: invert(0.88) hue-rotate(180deg) brightness(0.9) contrast(0.95);
+  mix-blend-mode: normal;
+}
 .research-hero figcaption, .evidence-layout figcaption, .table-caption { margin-top: 0.65rem; color: var(--muted); font-size: 0.57rem; line-height: 1.55; }
 
 .purpose-statement { display: grid; grid-template-columns: 9rem 1fr; gap: 2rem; padding: 2rem 0; border-bottom: 1px solid var(--line); }
