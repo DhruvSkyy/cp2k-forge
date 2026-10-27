@@ -1,8 +1,62 @@
 ---
-hide:
-  - navigation
-  - toc
+hide-toc: true
 ---
+
+```{toctree}
+:hidden:
+:caption: Getting started
+
+getting-started/installation
+getting-started/quickstart
+getting-started/cp2k-dependency
+```
+
+```{toctree}
+:hidden:
+:caption: User guide
+
+guide/how-it-works
+guide/configuration
+guide/hybrid-dft
+guide/campaigns-hpc
+guide/validation
+guide/showcase-density
+guide/troubleshooting
+```
+
+```{toctree}
+:hidden:
+:caption: Case studies
+
+case-studies/index
+case-studies/water
+case-studies/fluoride
+case-studies/cost
+```
+
+```{toctree}
+:hidden:
+:caption: Reference
+
+reference/cli
+reference/api/pipeline
+reference/api/config-io
+reference/api/environment
+reference/templates
+```
+
+```{toctree}
+:hidden:
+:caption: About
+
+about/method
+about/provenance
+about/changelog
+about/license
+assets/README
+```
+
+# CP2K-FORGE
 
 <header class="research-hero">
   <div class="research-hero__text">
@@ -25,7 +79,7 @@ hide:
     </div>
   </div>
   <figure class="research-hero__figure">
-    <img src="assets/figures/fig_systems.png" alt="The bulk-water and fluoride-in-water validation cells used in the reported study">
+    <img src="_images/fig_systems.png" alt="The bulk-water and fluoride-in-water validation cells used in the reported study">
     <figcaption>Figure 1. The two validation systems used in the accompanying MPhil study: 64 water molecules, and one fluoride ion in 64 water molecules.</figcaption>
   </figure>
 </header>
@@ -95,7 +149,7 @@ The workflow was tested on bulk water and fluoride in water with the same code a
     <p class="table-caption">Table 1. Reported hybrid revPBE0-D3 results. Force comparisons use the same held-out frames for each pair of models.</p>
   </div>
   <figure>
-    <img src="assets/figures/fig_forge_cost_curve.png" alt="Held-out force RMSE against cumulative build cost for water and fluoride campaigns">
+    <img src="_images/fig_forge_cost_curve.png" alt="Held-out force RMSE against cumulative build cost for water and fluoride campaigns">
     <figcaption>Figure 2. Held-out force error against cumulative build cost. Error bars are bootstrap uncertainties.</figcaption>
   </figure>
 </div>

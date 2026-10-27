@@ -5,16 +5,20 @@ validation gates and convergence rule. From that file the pipeline repeats a com
 sequence — sample, select, label, train, validate — until a convergence or budget stop
 fires. This page walks the loop stage by stage and names the module that owns each one.
 
-```mermaid
-flowchart LR
-  S["Sample<br/><small>foundation or promoted model</small>"] --> C["Select<br/><small>random, time-decorrelated</small>"]
-  C --> L["Label<br/><small>CP2K DFT single points</small>"]
-  L --> T["Train<br/><small>same compact recipe</small>"]
-  T --> V["Validate<br/><small>force + stability gates</small>"]
-  V --> D{"plateau or<br/>budget?"}
-  D -- yes --> M["accepted model"]
-  D -- no --> S
-```
+<div class="pipeline-diagram" role="img" aria-label="The CP2K-FORGE campaign samples configurations, selects decorrelated frames, labels them with CP2K DFT, trains a compact model, validates it, and repeats until a plateau or budget stop is reached.">
+  <div><strong>Sample</strong><span>foundation or promoted model</span></div>
+  <i aria-hidden="true">→</i>
+  <div><strong>Select</strong><span>decorrelated frames</span></div>
+  <i aria-hidden="true">→</i>
+  <div><strong>Label</strong><span>CP2K DFT</span></div>
+  <i aria-hidden="true">→</i>
+  <div><strong>Train</strong><span>compact MACE</span></div>
+  <i aria-hidden="true">→</i>
+  <div><strong>Validate</strong><span>force and stability</span></div>
+  <i aria-hidden="true">→</i>
+  <div class="pipeline-diagram__decision"><strong>Stop?</strong><span>plateau or budget</span></div>
+  <p><b>No:</b> sample again with the promoted model. <b>Yes:</b> retain the accepted model.</p>
+</div>
 
 ## Sample — `cp2k_forge.generate` + `cp2k_forge.engines`
 

@@ -32,11 +32,12 @@ data: the **Case studies** section of the documentation.
 
 **Live:** **https://www.dhruvs.com/cp2k-forge/**
 
-Or build it locally (same MkDocs Material site):
+Or build it locally (the documentation uses Sphinx, MyST Markdown and Furo):
 
 ```
 pip install -e ".[docs]"
-mkdocs serve        # then open http://127.0.0.1:8000
+sphinx-build -M dirhtml docs docs/_build -W --keep-going
+python -m http.server -d docs/_build/dirhtml 8000
 ```
 
 Start with *Getting started → CP2K as a dependency* for exactly how the CP2K coupling
@@ -151,7 +152,7 @@ configs/            water.yaml (revPBE-D3), water_hybrid.yaml (revPBE0-D3/ADMM),
 examples/           water32.xyz + water64.xyz seed structures
 showcase/           run_isobar.py, density_tmd.py, plot_tmd.py, bench_throughput.py
 tests/              torch-free parser + input-render regression tests
-docs/               the MkDocs site (mkdocs serve); case studies with report data
+docs/               the Sphinx/Furo site; case studies with report data
 example_job.sh      generic, scheduler-agnostic batch-job template
 ```
 
@@ -195,7 +196,8 @@ binary) and `SYMMETRIX_EXTRACT_SRC` (the model-to-JSON exporter).
 pip install -e ".[train,plot,docs]" pytest black
 pytest                 # torch-free unit tests (parser round-trip, input renders)
 black .                # the repo is black-formatted; CI checks it
-mkdocs serve           # the documentation site at http://127.0.0.1:8000
+sphinx-build -M dirhtml docs docs/_build -W --keep-going
+python -m http.server -d docs/_build/dirhtml 8000
 cp2k-forge --config configs/smoke.yaml   # mock end-to-end self-test (no CP2K/GPU)
 ```
 

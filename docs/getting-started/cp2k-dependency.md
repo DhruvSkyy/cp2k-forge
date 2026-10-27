@@ -102,8 +102,11 @@ Then `cp2k-forge --check --config <your config>` confirms the binary answers
 `--version`, the data files are reachable, and (for `mode: hybrid`) the ADMM files are
 present — before any compute is spent.
 
-!!! note "Which stages actually need CP2K"
-    Only labelling does (and the isolated-atom E0 references, computed during the label
-    stage). A GPU train-only invocation (`--stop-after` splitting, see
-    [Campaigns on HPC](../guide/campaigns-hpc.md)) is not failed for lacking CP2K, and
-    the mock self-test never touches it.
+:::{admonition} Which stages actually need CP2K
+:class: note
+
+Only labelling does (and the isolated-atom E0 references, computed during the label
+stage). A GPU train-only invocation (`--stop-after` splitting, see
+[Campaigns on HPC](../guide/campaigns-hpc.md)) is not failed for lacking CP2K, and
+the mock self-test never touches it.
+:::

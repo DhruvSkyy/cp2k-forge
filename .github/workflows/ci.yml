@@ -37,8 +37,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      # Editable install gives mkdocstrings the real package plus its core deps.
+      # Editable install gives autodoc the real package plus its core deps.
       - name: Install (docs)
         run: python -m pip install -e ".[docs]"
       - name: Build site (strict)
-        run: mkdocs build --strict
+        run: sphinx-build -M dirhtml docs docs/_build -W --keep-going

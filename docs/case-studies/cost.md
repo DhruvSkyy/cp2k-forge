@@ -15,11 +15,14 @@ ab initio trajectory at all.
 *Retained-label cost of the two routes. The third bar per system — the parent AIMD
 trajectory (600,000 / 104,000 steps) — is the cost this workflow removes entirely.*
 
-!!! info "Extrapolation, clearly labelled"
-    The committee-route costs are **extrapolations from this work's measured
-    per-single-point cost**, not measurements of the original work (≈8,600 / ≈3,700
-    core-h for labels alone; parent AIMD of order 10⁶ core-h) — order-of-magnitude
-    statements, not benchmarks.
+:::{admonition} Extrapolation, clearly labelled
+:class: note
+
+The committee-route costs are **extrapolations from this work's measured
+per-single-point cost**, not measurements of the original work (≈8,600 / ≈3,700
+core-h for labels alone; parent AIMD of order 10⁶ core-h) — order-of-magnitude
+statements, not benchmarks.
+:::
 
 ## Measured cost of the accepted paths
 
@@ -41,7 +44,7 @@ Two structural facts fall out of the ledger. First, **the loop machinery is chea
 to the labels**: the whole 8-pass fluoride GPU budget is worth about 90 hybrid single
 points, and sampling cost is the same whether the foundation model or the compact model
 explores — so the on-policy structural recovery in the
-[fluoride study](fluoride.md#the-on-policy-recovery-the-pass-history-is-the-result) came
+{ref}`fluoride study <fluoride-on-policy-recovery>` came
 essentially free. Second, GPU cost per pass stays roughly **flat** as the label set
 grows; the operational bottleneck is deciding how many expensive target-level labels to
 acquire, not retraining. A hybrid label is itself the premium: the semi-local level is
@@ -62,10 +65,13 @@ A100-h):
 
 ![Accuracy vs cumulative cost](../assets/figures/fig_forge_cost_curve.png)
 
-!!! warning "Caveat on the cost curve"
-    The water series covers **passes 1-3 only** (it predates the 89-label ambient
-    headline campaign); the fluoride series is complete (8 passes, 86.3 → 57.7 meV/Å
-    over 209 → 1,640 core-equiv-h). The CSV ships with these docs.
+:::{admonition} Caveat on the cost curve
+:class: warning
+
+The water series covers **passes 1-3 only** (it predates the 89-label ambient
+headline campaign); the fluoride series is complete (8 passes, 86.3 → 57.7 meV/Å
+over 209 → 1,640 core-equiv-h). The CSV ships with these docs.
+:::
 
 And the Schran-style scorecard collects the force / RDF / VDOS agreement bars for both
 compact models and both committees against the same ab initio references:

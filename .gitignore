@@ -16,6 +16,7 @@ runs/
 
 # Built documentation site
 site/
+docs/_build/
 
 # CP2K scratch outputs (reference fixtures use .out.ref and stay tracked)
 *.out

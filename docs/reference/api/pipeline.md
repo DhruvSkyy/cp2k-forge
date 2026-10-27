@@ -6,36 +6,45 @@ state, so they are individually testable.
 
 ## Generate
 
-::: cp2k_forge.generate
+```{automodule} cp2k_forge.generate
+```
 
 ## Decorrelation
 
-::: cp2k_forge.decorrelation
+```{automodule} cp2k_forge.decorrelation
+```
 
 ## Subsample
 
-::: cp2k_forge.subsample
+```{automodule} cp2k_forge.subsample
+```
 
 ## DIRECT selection
 
-::: cp2k_forge.direct
+```{automodule} cp2k_forge.direct
+```
 
 ## Label
 
-::: cp2k_forge.label
+```{automodule} cp2k_forge.label
+```
 
 ## Isolated-atom references
 
-::: cp2k_forge.e0s
+```{automodule} cp2k_forge.e0s
+```
 
 ## Train
 
-::: cp2k_forge.train
+```{automodule} cp2k_forge.train
+```
 
 ## Validate
 
-::: cp2k_forge.validate
+```{automodule} cp2k_forge.validate
+```
 
 ## Reports
 
-::: cp2k_forge.report
+```{automodule} cp2k_forge.report
+```

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">CP2K-FORGE</title>
+  <path d="M32 3.8 55.5 17.4v27.2L32 58.2 8.5 44.6V17.4Z" fill="none" stroke="#d8dde1" stroke-width="3.2"/>
+  <path d="M20.5 39.5V23.7h20.2M20.5 31.4h15.2" fill="none" stroke="#d8dde1" stroke-width="4.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="47.8" cy="15.3" r="5.1" fill="#c47f91"/>
+  <circle cx="13.4" cy="47.3" r="3.2" fill="#76a5c5"/>
+</svg>

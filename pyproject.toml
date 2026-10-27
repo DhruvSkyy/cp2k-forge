@@ -34,8 +34,10 @@ train = [
 ]
 plot = ["matplotlib"]
 docs = [
-    "mkdocs-material>=9.5",
-    "mkdocstrings[python]>=0.24",
+    "furo>=2024.8.6",
+    "myst-parser>=3.0",
+    "sphinx>=7.2,<9",
+    "sphinx-copybutton>=0.5.2",
 ]
 
 [project.urls]

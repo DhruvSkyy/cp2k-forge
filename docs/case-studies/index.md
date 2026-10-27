@@ -26,21 +26,24 @@ and F-H solvation-shell structure yet contributes little to aggregate force scor
 
 ## How to read these numbers
 
-!!! info "Scope and claim discipline (inherited from the report's claims audit)"
-    - The comparison with the committee is **intentionally scoped**: the published
-      models span broader aqueous conditions; the relevant target is the shared ambient
-      regime, not universal transferability.
-    - **Committee route costs are extrapolations** from this work's per-single-point
-      cost, not measurements of the original work.
-    - The default selector in these campaigns was **random decorrelated frames** —
-      FPS/uncertainty selectors are drop-in options, *not benchmarked* at matched budget.
-    - Each system is **one campaign**: the pass sequence cannot isolate sampler, label
-      count and retraining as separate variables.
-    - What a forged model *enables* in CP2K (mixed DFT/MLP, QM/MM, path integrals,
-      enhanced sampling) is **enabled, not measured** — no such production run is
-      claimed.
-    - Density and TMD claims follow the audited language described in
-      [Showcase and density](../guide/showcase-density.md).
+:::{admonition} Scope and claim discipline
+:class: note
+
+- The comparison with the committee is **intentionally scoped**: the published
+  models span broader aqueous conditions; the relevant target is the shared ambient
+  regime, not universal transferability.
+- **Committee route costs are extrapolations** from this work's per-single-point
+  cost, not measurements of the original work.
+- The default selector in these campaigns was **random decorrelated frames** —
+  FPS/uncertainty selectors are drop-in options, *not benchmarked* at matched budget.
+- Each system is **one campaign**: the pass sequence cannot isolate sampler, label
+  count and retraining as separate variables.
+- What a forged model *enables* in CP2K (mixed DFT/MLP, QM/MM, path integrals,
+  enhanced sampling) is **enabled, not measured** — no such production run is
+  claimed.
+- Density and TMD claims follow the audited language described in
+  [Showcase and density](../guide/showcase-density.md).
+:::
 
 | Page | What it covers |
 | --- | --- |

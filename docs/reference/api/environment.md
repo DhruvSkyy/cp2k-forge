@@ -5,20 +5,25 @@ and the stage timers.
 
 ## CLI driver
 
-::: cp2k_forge.cli
+```{automodule} cp2k_forge.cli
+```
 
 ## Doctor (preflight)
 
-::: cp2k_forge.doctor
+```{automodule} cp2k_forge.doctor
+```
 
 ## CP2K discovery
 
-::: cp2k_forge.cp2k_env
+```{automodule} cp2k_forge.cp2k_env
+```
 
 ## MD engines
 
-::: cp2k_forge.engines
+```{automodule} cp2k_forge.engines
+```
 
 ## Timing
 
-::: cp2k_forge.timing
+```{automodule} cp2k_forge.timing
+```

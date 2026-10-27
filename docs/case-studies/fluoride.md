@@ -31,6 +31,7 @@ pre-registered 2.0 meV/Å band. Pass 8 is a convergence decision, not a manual c
 
 ![Fluoride learning curve](../assets/figures/fig_fluoride_learning.png)
 
+(fluoride-on-policy-recovery)=
 ## The on-policy recovery — the pass history is the result
 
 During the five foundation-sampled passes, labels improve held-out forces by 27% (86.3 →

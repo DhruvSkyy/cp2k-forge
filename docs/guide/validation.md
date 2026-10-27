@@ -49,11 +49,14 @@ rule chosen after seeing the curve proves nothing. Water stopped with final gain
 1.42 and 0.72 meV/Å (bootstrap upper edges 1.52 and 0.78 < 2.0); fluoride with upper
 edges 1.86 and 1.51.
 
-!!! note "Pass validity"
-    `subsample.min_frames` is a validity floor: a pass that labels fewer frames is never
-    deployed and never plotted, but it still enters the pass-to-pass improvement
-    sequence the rule tracks. The rule does not require the curve to be flat — it stops
-    when the certified improvement is smaller than the pre-set band.
+:::{admonition} Pass validity
+:class: note
+
+`subsample.min_frames` is a validity floor: a pass that labels fewer frames is never
+deployed and never plotted, but it still enters the pass-to-pass improvement
+sequence the rule tracks. The rule does not require the curve to be flat — it stops
+when the certified improvement is smaller than the pre-set band.
+:::
 
 Two cheaper stops complement the rule: `loop.min_rel_improvement_force` (quit when a
 pass buys less than a set *fraction* of improvement — extra labels are not buying
