@@ -55,11 +55,13 @@ def _e0s_argument(e0s: dict | None) -> str:
 def load_e0s(cfg, workdir: str | Path) -> dict | None:
     """Resolve the E0s dict for training, per cfg.train.e0s_mode.
 
-    "average"  -> None (mace_run_train fits them)
-    "isolated" -> workdir/e0s.json, produced by cp2k_forge.e0s.ensure_e0s during the label
-                  stage (hard error if absent: the CP2K node did not run it)
-    "file"     -> cfg.train.e0s_file (relative paths resolve from the config
-                  file's directory)
+    Modes::
+
+        "average"  -> None (mace_run_train fits them)
+        "isolated" -> workdir/e0s.json, produced by cp2k_forge.e0s.ensure_e0s during the label
+                      stage (hard error if absent: the CP2K node did not run it)
+        "file"     -> cfg.train.e0s_file (relative paths resolve from the config
+                      file's directory)
     """
     import json
 

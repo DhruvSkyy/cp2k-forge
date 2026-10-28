@@ -4,7 +4,8 @@ The whole pipeline is a state machine persisted to one JSON file. Every mutation
 written atomically (temp file + os.replace) so a run killed at any point — laptop lid
 closed, SLURM pre-emption — resumes from the last completed step rather than restarting.
 
-State shape:
+State shape::
+
     {
       "config_path": "...",
       "current_pass": 2,

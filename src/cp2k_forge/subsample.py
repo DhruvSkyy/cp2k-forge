@@ -76,12 +76,14 @@ def subsample(
 ):
     """Return up to `n_per_pass` diverse frames from `frames`.
 
-    method="none"   -> no diversity selection; label the (already-decorrelated) frames as
-                       they are. Tests whether time-decorrelation alone suffices.
-    method="random" -> seeded uniform draw; the null hypothesis for the selection ablation.
-    method="fps"    -> farthest-point sampling on a hand-built RDF descriptor (no model).
-    method="direct" -> DIRECT (foundation-model features -> PCA -> KMeans -> stratified pick);
-                       `foundation_model`/`device` select the featurizer (the npj recipe).
+    Selection methods::
+
+        method="none"   -> no diversity selection; label the (already-decorrelated) frames as
+                           they are. Tests whether time-decorrelation alone suffices.
+        method="random" -> seeded uniform draw; the null hypothesis for the selection ablation.
+        method="fps"    -> farthest-point sampling on a hand-built RDF descriptor (no model).
+        method="direct" -> DIRECT (foundation-model features -> PCA -> KMeans -> stratified pick);
+                           `foundation_model`/`device` select the featurizer (the npj recipe).
 
     `dataset_frames` (the cumulative labelled dataset) makes "fps" and "direct" dataset-
     conditioned: picks maximise distance to what is already labelled, not just to each

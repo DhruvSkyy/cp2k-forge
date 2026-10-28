@@ -5,30 +5,36 @@ the run-state machine.
 
 ## Configuration
 
-```{automodule} cp2k_forge.config
+```{eval-rst}
+.. automodule:: cp2k_forge.config
 ```
 
 ## CP2K input templating and log parsing
 
-```{automodule} cp2k_forge.cp2k_io
+```{eval-rst}
+.. automodule:: cp2k_forge.cp2k_io
 ```
 
 ## Units
 
-```{automodule} cp2k_forge.units
+```{eval-rst}
+.. automodule:: cp2k_forge.units
 ```
 
 ## Dataset
 
-```{automodule} cp2k_forge.dataset
+```{eval-rst}
+.. automodule:: cp2k_forge.dataset
 ```
 
 ## Seed loading
 
-```{automodule} cp2k_forge.seed
+```{eval-rst}
+.. automodule:: cp2k_forge.seed
 ```
 
 ## Manifest (run state)
 
-```{automodule} cp2k_forge.manifest
+```{eval-rst}
+.. automodule:: cp2k_forge.manifest
 ```

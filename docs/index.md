@@ -53,6 +53,7 @@ about/method
 about/provenance
 about/changelog
 about/license
+GitHub <https://github.com/DhruvSkyy/cp2k-forge>
 ```
 
 # CP2K-FORGE
@@ -83,6 +84,32 @@ You write one YAML file describing your system. CP2K-FORGE then:
   <li><strong>Labels them with CP2K.</strong> Every kept structure gets a DFT single point (semi-local GGA, or hybrid revPBE0-D3). These labels are the only training data.</li>
   <li><strong>Trains a compact MACE from scratch.</strong> No weights are inherited, so the model's physics is exactly the DFT level you chose.</li>
 </ul>
+
+A campaign, trimmed from `configs/water_hybrid.yaml`:
+
+```yaml
+system:
+  seed_xyz: ../examples/water64.xyz
+  elements: [H, O]
+  cell_abc: [12.4313, 12.4313, 12.4313]
+dft:
+  mode: hybrid              # revPBE0-D3 under ADMM
+  functional: revPBE
+generator:
+  model: mace-mp-0          # the sampler; its labels are discarded
+explore:
+  temperatures_k: [300]
+subsample:
+  method: random
+  n_per_pass: 10            # DFT labels added per pass
+train:
+  num_channels: 96          # compact by design
+loop:
+  max_passes: 15
+  min_rel_improvement_force: 0.05   # stop when a pass improves < 5%
+```
+
+Every key is documented in the [configuration reference](guide/configuration.md).
 
 This is not distillation, not fine-tuning and not query-by-committee. The loop repeats until a convergence rule, fixed before the campaign starts, says more labels no longer help.
 

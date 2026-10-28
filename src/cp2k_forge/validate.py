@@ -2,7 +2,7 @@
 
 Held-out force RMSE is computed on frames the *foundation* model generated, so it is
 in-distribution and circular: it cannot see where the *trained* model's own dynamics
-drift. This module adds the checks that actually test physics:
+drift. This module adds the checks that actually test physics::
 
   compute_rdf            structural validation — g_OO/g_OH/g_HH vs reference AIMD
   own_trajectory_spot_check

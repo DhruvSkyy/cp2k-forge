@@ -5,11 +5,13 @@ the MACE reference keys and appended to the dataset. Labelling is resumable: a f
 whose hash is already in the manifest's done-list is skipped, so a killed run does not
 recompute finished single points.
 
-CP2K invocation is overridable by environment so the same run works on any machine:
+CP2K invocation is overridable by environment so the same run works on any machine::
+
     CP2K_BIN            (default: dft.cp2k_bin)      path to the CP2K binary
     CP2K_MPI_LAUNCHER   (default: "mpirun")          use "none" for an OMP-only build
     CP2K_RANKS          (default: dft.cp2k_ranks)    MPI ranks per single point
     CP2K_OMP_THREADS    (default: auto from cores)   OMP threads per rank
+
 CP2K also needs its data files (BASIS_MOLOPT, GTH_POTENTIALS, dftd3.dat): set the
 standard CP2K_DATA_DIR, or leave it unset and a directory next to the binary's
 install tree is derived and exported to the subprocess (see cp2k_forge.cp2k_env).

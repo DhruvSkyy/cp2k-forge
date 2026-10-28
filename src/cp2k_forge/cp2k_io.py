@@ -286,11 +286,13 @@ def write_aimd_input(
 def parse_singlepoint_output(out_path: str | Path):
     """Parse a CP2K ENERGY_FORCE log.
 
-    Returns a dict with keys:
+    Returns a dict with keys::
+
         energy_ev    float
         forces       list[[fx, fy, fz]] in eV/Angstrom
         stress       list of 6 floats (Voigt xx,yy,zz,yz,xz,xy) in eV/Angstrom^3,
                      or None if no stress block was printed
+
     Raises ValueError if energy or forces are absent (i.e. the job did not finish).
     """
     lines = Path(out_path).read_text().splitlines()
