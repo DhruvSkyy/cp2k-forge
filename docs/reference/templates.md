@@ -12,7 +12,7 @@ Placeholders common to the DFT templates, filled from the structure and `dft:` c
 mode), `{cutoff}`, `{rel_cutoff}`, `{eps_scf}`, `{max_scf}`, `{functional}`,
 `{dispersion_ref}`, `{d3_suffix}` (empty for zero damping, `(BJ)` for Becke-Johnson).
 
-## `dft_singlepoint.inp` — the GGA labelling workhorse
+## `dft_singlepoint.inp`: the GGA labelling workhorse
 
 Rendered by `write_singlepoint_input` for `dft.mode: gga`. A Quickstep `ENERGY_FORCE`
 single point with `STRESS_TENSOR ANALYTICAL` (the stress feeds `REF_stress` when
@@ -20,7 +20,7 @@ present), OT SCF, and D3 dispersion referenced to `{dispersion_ref}`. A nonzero
 `dft.charge` is post-injected as a `CHARGE` line; `charge: 0` leaves the rendered text
 byte-identical to the chargeless original (locked by a golden-fixture test).
 
-## `dft_singlepoint_hybrid.inp` — the ADMM/HFX labelling input
+## `dft_singlepoint_hybrid.inp`: the ADMM/HFX labelling input
 
 Rendered for `dft.mode: hybrid`. Adds, over the GGA template: the dual basis files
 (`BASIS_MOLOPT` + `BASIS_ADMM`), the `&AUXILIARY_DENSITY_MATRIX_METHOD` section
@@ -29,12 +29,12 @@ scaled GGA exchange (`SCALE_X {gga_x_scale}` = 1 − hf_fraction), the `&HF` sec
 (`FRACTION {hf_fraction}`, `EPS_SCHWARZ {eps_schwarz}`,
 `MAX_MEMORY {hfx_max_memory}`, `POTENTIAL_TYPE TRUNCATED` with
 `CUTOFF_RADIUS {hfx_cutoff_radius}` and `T_C_G_DATA t_c_g.dat`), and a directly rendered
-`CHARGE {charge}`. **No stress print** — the HFX/ADMM stress path is version-fragile
+`CHARGE {charge}`. **No stress print**: the HFX/ADMM stress path is version-fragile
 across CP2K releases, and the parser tolerates the missing block
 ([consequences](../guide/hybrid-dft.md#no-stress-at-this-level)). The render is guarded
 by the per-frame truncated-Coulomb legality check.
 
-## `dft_atom.inp` / `dft_atom_hybrid.inp` — isolated-atom E0 references
+## `dft_atom.inp` / `dft_atom_hybrid.inp`: isolated-atom E0 references
 
 Rendered by `write_atom_input` once per element and campaign. Siblings of the
 single-point templates rather than edits of them: they add `UKS` +
@@ -44,7 +44,7 @@ level**, so the E0s are consistent with the dataset energies. Both hardcode `CHA
 E0 references stay neutral even for a charged box
 ([why](../guide/hybrid-dft.md#charged-cells-and-e0-references)).
 
-## `aimd_reference.inp` — the optional AIMD validation reference
+## `aimd_reference.inp`: the optional AIMD validation reference
 
 Rendered by `write_aimd_input` when you want an in-house ab initio RDF/VDOS reference:
 Born-Oppenheimer NVT MD at the labelling level with a Nosé-Hoover thermostat, ASPC
@@ -52,7 +52,7 @@ wavefunction extrapolation and an MD-appropriate looser SCF; positions/velocitie
 printed every `{sample_every}` steps (→ RDF / VDOS references), with an optional
 `&EXT_RESTART` block so a multi-day AIMD survives walltime caps as a restart chain.
 
-## `md_backend.inp` — the optional in-CP2K MD path
+## `md_backend.inp`: the optional in-CP2K MD path
 
 The template for running trained-model MD *inside* CP2K
 (`generator.engine: cp2k-backend`). It requires a metatomic-enabled CP2K build, which is

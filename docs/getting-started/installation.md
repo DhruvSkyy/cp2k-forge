@@ -2,7 +2,7 @@
 
 CP2K-FORGE is a pure-Python package. Two installs are involved: the Python side (this
 page) and a CP2K binary for DFT labelling
-([CP2K as a dependency](cp2k-dependency.md) — not needed for the mock self-test or for a
+([CP2K as a dependency](cp2k-dependency.md); not needed for the mock self-test or for a
 GPU train-only node).
 
 ## The short version
@@ -21,6 +21,7 @@ cp2k-forge --check      # verify everything before spending compute
 ## Into your own environment
 
 ```bash
+python -m pip install -U pip     # editable installs need pip >= 21.3
 pip install -e ".[train,plot]"
 ```
 
@@ -35,7 +36,7 @@ heavy dependencies are installed.
 | *(core)* | numpy, pyyaml, ase, scikit-learn | config load, `--check`, CP2K I/O, tests |
 | `[train]` | mace-torch (and torch), torch-dftd | MD generation, training, validation, the mock self-test |
 | `[plot]` | matplotlib | validation and showcase figures (skipped with a note if absent) |
-| `[docs]` | mkdocs-material, mkdocstrings | building this documentation site |
+| `[docs]` | sphinx, furo, myst-parser, sphinx-copybutton | building this documentation site |
 
 ## GPU nodes: pick the torch wheel explicitly
 

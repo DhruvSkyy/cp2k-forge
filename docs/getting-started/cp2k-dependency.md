@@ -10,14 +10,14 @@ For every structure that needs a label, the pipeline:
 
 1. **renders a CP2K input file** from a template shipped inside the package
    (`cp2k_forge/templates/dft_singlepoint.inp`, or the hybrid variant when
-   `dft.mode: hybrid`) — the structure's coordinates and cell plus your `dft:` settings
+   `dft.mode: hybrid`), the structure's coordinates and cell plus your `dft:` settings
    become a complete Quickstep `ENERGY_FORCE` input;
 2. **runs the CP2K binary as a subprocess** in a per-structure scratch directory,
    normally under an MPI launcher:
    `mpirun -np <ranks> <cp2k binary> -i dft.inp -o dft.out`;
 3. **parses the log** (`cp2k_forge.cp2k_io.parse_singlepoint_output`) and converts the
    energy, forces and (GGA only) stress from CP2K's Hartree / Hartree-Bohr⁻¹ units to
-   the eV-based units MACE trains on — all conversions live in one module,
+   the eV-based units MACE trains on; all conversions live in one module,
    `cp2k_forge/units.py`, pinned by a torch-free regression test.
 
 Because the coupling is subprocess-plus-files, **any working CP2K binary works**: there
@@ -90,7 +90,7 @@ Two subtleties the pipeline handles for you (see `cp2k_forge.label`):
 
 ## Installing CP2K
 
-Any route works — pick whatever your machine prefers:
+Any route works; pick whatever your machine prefers:
 
 - conda-forge: `conda install -c conda-forge cp2k`
 - Linux distros: `apt install cp2k` / `dnf install cp2k`
@@ -100,7 +100,7 @@ Any route works — pick whatever your machine prefers:
 
 Then `cp2k-forge --check --config <your config>` confirms the binary answers
 `--version`, the data files are reachable, and (for `mode: hybrid`) the ADMM files are
-present — before any compute is spent.
+present, before any compute is spent.
 
 :::{admonition} Which stages actually need CP2K
 :class: note

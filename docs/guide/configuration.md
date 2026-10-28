@@ -4,7 +4,7 @@ One YAML file holds the whole campaign. The same file sets the sampling switch, 
 budget, convergence rule and plateau strictness, and the same DFT settings generate the
 training and held-out labels, so fitting and scoring can never drift apart. Load-time
 validation (`Config.validate`) fails fast on inconsistent combinations, and every value
-can be overridden per run with `--set section.key=value` (repeatable) — which is how
+can be overridden per run with `--set section.key=value` (repeatable), which is how
 ablation arms stay identical by construction.
 
 A trimmed campaign looks like this (see `configs/water.yaml`, `configs/water_hybrid.yaml`
@@ -43,18 +43,18 @@ pass through unchanged.
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `name` | — (required) | campaign name; prefixes model files |
-| `seed_xyz` | — (required) | initial structure (XYZ/extended-XYZ). If the file carries its own lattice it must agree with `cell_abc` to 1e-3 Å — the loader refuses to silently rescale |
-| `elements` | — (required) | element symbols present |
-| `cell_abc` | — (required) | orthorhombic box lengths, Å |
+| `name` | (required) | campaign name; prefixes model files |
+| `seed_xyz` | (required) | initial structure (XYZ/extended-XYZ). If the file carries its own lattice it must agree with `cell_abc` to 1e-3 Å, and the loader refuses to silently rescale |
+| `elements` | (required) | element symbols present |
+| `cell_abc` | (required) | orthorhombic box lengths, Å |
 
-## `dft` — the labelling level
+## `dft`: the labelling level
 
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `functional` | `revPBE` | XC functional (CP2K `PARAMETRIZATION` token) |
 | `vdw` | `dftd3` | `dftd3` renders the D3 pair potential; `none` strips the vdW section for a dispersion-free labelling level (the two D3 knobs below then do nothing) |
-| `dispersion_ref` | `revPBE` | `REFERENCE_FUNCTIONAL` for the D3 correction — for `mode: hybrid` set this to the **hybrid** name (e.g. `revPBE0`), not the GGA base |
+| `dispersion_ref` | `revPBE` | `REFERENCE_FUNCTIONAL` for the D3 correction. For `mode: hybrid` set this to the **hybrid** name (e.g. `revPBE0`), not the GGA base |
 | `d3_damping` | `zero` | `zero` (DFTD3) or `bj`. For water/revPBE, zero damping is correct; BJ inverts the ice/water density order |
 | `cutoff_ry`, `rel_cutoff_ry` | 400, 50 | plane-wave cutoffs (Ry) |
 | `basis_set` | `TZV2P-MOLOPT-GTH` | orbital basis for every kind |
@@ -63,11 +63,11 @@ pass through unchanged.
 | `charge` | 0 | net cell charge (e.g. −1 for a fluoride box; compensated by the GPW background). E0 atoms stay neutral regardless |
 | `uks` | false | open-shell labelling (E0 atoms set UKS via their own template independently) |
 | `cp2k_bin`, `cp2k_ranks` | `cp2k.psmp`, 4 | overridden by `CP2K_BIN` / `CP2K_RANKS` |
-| `label_workers` | 1 | concurrent CP2K frames per node — several modest-width points beat one node-wide run |
+| `label_workers` | 1 | concurrent CP2K frames per node; several modest-width points beat one node-wide run |
 | `backend` | `cp2k` | `mock_foundation` labels with the cached foundation calculator instead of DFT (install self-test; plumbing only, never science) |
 | `mock_model`, `mock_device` | `mace-mp-0`, `cpu` | the mock backend's calculator |
 
-### `dft` — hybrid block (`mode: hybrid`)
+### `dft`: hybrid block (`mode: hybrid`)
 
 Renders `dft_singlepoint_hybrid.inp` instead of the GGA template; `mode: gga` keeps the
 GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
@@ -75,32 +75,32 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `mode` | `gga` | `gga` \| `hybrid` |
-| `hf_fraction` | 0.25 | `&HF FRACTION`; the GGA exchange `SCALE_X` is always derived as `1 − hf_fraction` — never a second knob |
-| `hfx_cutoff_radius_ang` | 6.0 | truncated-Coulomb radius. **Must be < min(cell)/2 for every labelled frame** (guarded at config load and per frame) and must never change mid-campaign — it is part of the level of theory |
+| `hf_fraction` | 0.25 | `&HF FRACTION`; the GGA exchange `SCALE_X` is always derived as `1 − hf_fraction`, never a second knob |
+| `hfx_cutoff_radius_ang` | 6.0 | truncated-Coulomb radius. **Must be < min(cell)/2 for every labelled frame** (guarded at config load and per frame) and must never change mid-campaign, it is part of the level of theory |
 | `eps_schwarz` | 1e-6 | `&HF &SCREENING EPS_SCHWARZ` |
-| `hfx_max_memory_mb` | 2400 | `&HF &MEMORY MAX_MEMORY` per MPI rank — raise on fat nodes to cut HFX recomputation |
+| `hfx_max_memory_mb` | 2400 | `&HF &MEMORY MAX_MEMORY` per MPI rank; raise on fat nodes to cut HFX recomputation |
 | `admm_basis` | `cpFIT3` | `AUX_FIT` basis for every kind (from `BASIS_ADMM`) |
-| `admm_basis_overrides` | `{}` | per-element `AUX_FIT` override, e.g. `{F: aug-cpFIT3}` — anions want diffuse auxiliary functions |
+| `admm_basis_overrides` | `{}` | per-element `AUX_FIT` override, e.g. `{F: aug-cpFIT3}`: anions want diffuse auxiliary functions |
 | `admm_purification` | `MO_DIAG` | `ADMM_PURIFICATION_METHOD` |
 | `admm_exch_correction_func` | `PBEX` | `EXCH_CORRECTION_FUNC` (with `EXCH_SCALING_MODEL NONE`) |
 
-## `generator` — the explorer
+## `generator`: the explorer
 
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `model` | `mace-mp-0` | foundation model name or a path to a `.model` file |
-| `dispersion` | true | add D3 to the foundation calculator — mandatory for water with MP-0 (no dispersion of its own → the liquid evaporates) |
+| `dispersion` | true | add D3 to the foundation calculator; mandatory for water with MP-0 (no dispersion of its own → the liquid evaporates) |
 | `device` | `cpu` | `cuda` on a GPU node (`gpu` is accepted and normalised) |
 | `engine` | `ase` | `ase` runs anywhere with mace-torch; `cp2k-backend` runs trained-model MD inside CP2K (needs a metatomic-enabled build; raises an actionable error without one) |
 | `enable_cueq` | false | cuEquivariance kernels for torch-side MD; silently off if the packages are missing |
 
-## `explore` — the sampling grid
+## `explore`: the sampling grid
 
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `temperatures_k` | [250, 270, 290, 310] | exploration temperatures |
 | `density_scales` | [0.95, 1.0, 1.05] | initial box scalings (bracket the equilibrium) |
-| `pressures_bar` | null | when set, the grid becomes temperatures × pressures and `density_scales` is ignored — explicit pressures pin the *ensemble* so sampled densities genuinely bracket |
+| `pressures_bar` | null | when set, the grid becomes temperatures × pressures and `density_scales` is ignored; explicit pressures pin the *ensemble* so sampled densities genuinely bracket |
 | `ensemble` | `NPT` | `NPT` samples density too; `NVT` keeps the (scaled) seed box |
 | `steps`, `timestep_fs` | 10000, 0.5 | per-cell MD length |
 | `sample_every` | 50 | raw probe stride (frames stored every N steps) |
@@ -122,7 +122,7 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `on_undersample` | `warn` | `fail` aborts generate when a cell cannot yield the target at the demanded stride; a static feasibility check at load catches the arithmetic version before any MD |
 | `n_replicas`, `velocity_seed_base` | 1, 0 | extra per-cell trajectories differing only in deterministic velocity seed |
 
-## `subsample` — the selector
+## `subsample`: the selector
 
 | Key | Default | Meaning |
 | --- | --- | --- |
@@ -131,18 +131,18 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `n_first_pass` | null | larger first batch (a from-scratch model needs more to be MD-stable); null → `n_per_pass` |
 | `min_frames` | 50 | pass-validity floor: a pass that labels fewer frames is invalid (never deployed, still counted by the plateau rule) |
 | `enabled` | true | false skips selection and labels the decorrelated frames directly |
-| `dataset_aware` | false | condition selection on the cumulative labelled set — never re-cover owned regions |
+| `dataset_aware` | false | condition selection on the cumulative labelled set; never re-cover owned regions |
 | `selection_seed` | 0 | RNG seed for `random` (varied per pass) |
 
-## `train` — the compact recipe
+## `train`: the compact recipe
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `num_channels`, `max_ell`, `num_interactions`, `r_max` | 64, 2, 2, 5.0 | the compact-model knobs — small by design; the deployment-speed claim depends on this |
+| `num_channels`, `max_ell`, `num_interactions`, `r_max` | 64, 2, 2, 5.0 | the compact-model knobs, small by design; the deployment-speed claim depends on this |
 | `mace_run_train_bin` | `mace_run_train` | trainer entry point (module fallback `python -m mace.cli.run_train` when not on PATH) |
 | `device`, `seed` | `cpu`, 1 | training device and seed |
 | `batch_size`, `max_num_epochs`, `valid_fraction` | 5, 200, 0.1 | optimiser basics |
-| `stress_weight` | 0.0 | >0 trains on the stress — **must stay 0 for `mode: hybrid`** (hybrid labels carry no stress). See the [physics caveat](../about/method.md#a-physics-caveat-worth-stating) |
+| `stress_weight` | 0.0 | >0 trains on the stress; it **must stay 0 for `mode: hybrid`** (hybrid labels carry no stress). See the [physics caveat](../about/method.md#a-physics-caveat-worth-stating) |
 | `energy_key`, `forces_key`, `stress_key` | `REF_*` | extended-XYZ label keys |
 | `pair_repulsion`, `pair_repulsion_until_pass` | false, 0 | ZBL short-range repulsion a tiny early dataset cannot teach (guards box collapse); 0 = every pass |
 | `e0s_mode` | `average` | `isolated` = one-time spin-polarised atoms at the exact labelling level (recommended; cached per workdir); `average` least-squares-fits and silently shifts as data grows; `file` reads a prepared `e0s.json` |
@@ -153,7 +153,7 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `warm_start`, `warm_lr`, `cold_epochs` | false, null, null | continue from the previous pass's checkpoint (pass 1 stays cold); safe only because the own-MD gate screens every promotion |
 | `enable_cueq` | false | cuEquivariance-accelerated training |
 
-## `loop` — budget, convergence, promotion
+## `loop`: budget, convergence, promotion
 
 | Key | Default | Meaning |
 | --- | --- | --- |
@@ -168,7 +168,7 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `promote_density_window_gcc` | [0.87, 1.10] | promotion density window |
 | `max_wall_hours` | null | portable wall-clock bound for the whole loop (scheduler-agnostic) |
 
-## `validate` — scorecard and probes
+## `validate`: scorecard and probes
 
 | Key | Default | Meaning |
 | --- | --- | --- |
@@ -176,13 +176,13 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `n_dft_spotcheck` | 10 | DFT single points on the model's *own* dynamics → force score |
 | `spotcheck_md_steps`, `spotcheck_temperature_k` | 2000, 300 | doubles as the stability MD (raise to ~20000 = 10 ps for a meaningful blow-up check) |
 | `validate_previous_model` | true | also score the prior model, so progress is visible pass to pass |
-| `fixed_test_xyz` | null | frozen held-out DFT test set — the constant yardstick for cross-pass and cross-arm comparisons |
+| `fixed_test_xyz` | null | frozen held-out DFT test set: the constant yardstick for cross-pass and cross-arm comparisons |
 | `testset_mode`, `testset_increment`, `testset_pool_xyz` | `fixed`, 5, null | incremental mode grows the ruler each pass from a never-trained-on pool |
 | `nvt_cell_abc` | null | observables MD cell (e.g. the experimental density), decoupling structure scores from the model's density error |
 | `rdf_ref_xyz`, `vdos_ref_npy` | null | external references; the corresponding score is skipped with a note when unset |
 | `rdf_pairs`, `rdf_r_max`, `rdf_nbins` | O-O/O-H/H-H, 6.0, 120 | RDF scoring grid |
 | `vdos_enabled`, `vdos_md_steps`, `vdos_temperature_k`, `vdos_rdf_stride` | false, 20000, 300, 100 | the NVE leg (also yields the RDF trajectory + an energy-conservation check) |
-| `density_probe_steps`, `density_probe_temperature_k` | 2000, null | NPT density probe; 2000 steps is a smoke value — a campaign needs ~100 ps for a ~0.006 g/cc standard error |
+| `density_probe_steps`, `density_probe_temperature_k` | 2000, null | NPT density probe; 2000 steps is a smoke value; a campaign needs ~100 ps for a ~0.006 g/cc standard error |
 | `density_ref_gcc`, `goo_peak_r_ref`, `goo_peak_h_ref` | null | experimental anchors, **reported next to scores, never gated** (classical nuclei at a given functional should not reproduce experiment exactly) |
 | `stability_min_oo_ang`, `stability_min_oh_ang` | 2.0, 0.7 | the own-MD stability gate's minimum approach distances |
 | `published_reference` | null | literature overlay for the per-pass figure suite |

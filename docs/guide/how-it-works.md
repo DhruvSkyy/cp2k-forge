@@ -2,7 +2,7 @@
 
 One YAML file defines the system, sampler, DFT labelling level, training recipe,
 validation gates and convergence rule. From that file the pipeline repeats a compact
-sequence — sample, select, label, train, validate — until a convergence or budget stop
+sequence (sample, select, label, train, validate) until a convergence or budget stop
 fires. This page walks the loop stage by stage and names the module that owns each one.
 
 <div class="pipeline-diagram" role="img" aria-label="The CP2K-FORGE campaign samples configurations, selects decorrelated frames, labels them with CP2K DFT, trains a compact model, validates it, and repeats until a plateau or budget stop is reached.">
@@ -20,10 +20,12 @@ fires. This page walks the loop stage by stage and names the module that owns ea
   <p><b>No:</b> sample again with the promoted model. <b>Yes:</b> retain the accepted model.</p>
 </div>
 
-## Sample — `cp2k_forge.generate` + `cp2k_forge.engines`
+## Sample
+
+*Code:* `cp2k_forge.generate` + `cp2k_forge.engines`
 
 Sampling produces the pool from which expensive DFT labels are drawn. Early passes use
-the foundation model (with D3 dispersion where the system needs it — raw MACE-MP-0 has
+the foundation model (with D3 dispersion where the system needs it; raw MACE-MP-0 has
 none and liquid water evaporates without it). After the **sampling switch**, the newest
 promoted compact model generates the structures used to train the next one; that keeps
 labels close to the region where the final model will actually run. The explored grid is
@@ -37,36 +39,42 @@ accepted trajectories are **thinned by autocorrelation time**
 frames never reach the selector. A static feasibility check at config load catches
 sampling arithmetic that could never yield the requested number of uncorrelated frames.
 
-## Select — `cp2k_forge.subsample` (+ `cp2k_forge.direct`)
+## Select
+
+*Code:* `cp2k_forge.subsample` (+ `cp2k_forge.direct`)
 
 The selector chooses the DFT batch from the decorrelated pool. The default draws
 **random decorrelated frames**, so a campaign tests the sampler and the gates rather
 than a separate active-learning rule. Uncertainty- or diversity-based selectors
 substitute through the same config field (`subsample.method`: `fps`, `direct` =
-foundation-model features → PCA → KMeans, or `none`) — but note that the report's
+foundation-model features → PCA → KMeans, or `none`), but note that the report's
 results were obtained with `random`, and no selector comparison has been run at a
 matched label budget.
 
-## Label — `cp2k_forge.label` + `cp2k_forge.cp2k_io` + `cp2k_forge.e0s`
+## Label
+
+*Code:* `cp2k_forge.label` + `cp2k_forge.cp2k_io` + `cp2k_forge.e0s`
 
 Each selected configuration becomes one CP2K Quickstep single point: an energy-and-force
 evaluation at fixed geometry, rendered from a packaged template and executed as a
 subprocess ([the full mechanism](../getting-started/cp2k-dependency.md)). Labelling
-parallelises directly — the points are independent, so they fan out across workers on a
+parallelises directly: the points are independent, so they fan out across workers on a
 node (`dft.label_workers`) and across jobs. Every finished point is keyed by a
 **structure hash** in the manifest, so failed jobs are retried without invalidating a
 pass and nothing is ever recomputed.
 
 Isolated-atom reference energies (E0s) are computed once per campaign at the exact
-labelling level — spin-polarised neutral atoms via their own template — and cached in
+labelling level (spin-polarised neutral atoms via their own template) and cached in
 the workdir, so the energy baseline never silently shifts as the dataset grows.
 
-## Train — `cp2k_forge.train`
+## Train
+
+*Code:* `cp2k_forge.train`
 
 Training fits a compact MACE through `mace_run_train` (optionally accelerated by
 cuEquivariance kernels) on the accumulated labels, and exports each checkpoint in the
-formats the CP2K backends need. The compact recipe — small `num_channels`, `max_ell`,
-`num_interactions` — is the point: the deployed model's speed depends on it. Pass 1
+formats the CP2K backends need. The compact recipe (small `num_channels`, `max_ell`,
+`num_interactions`) is the point: the deployed model's speed depends on it. Pass 1
 trains from scratch; later passes can warm-start from the previous checkpoint to save
 compute, which is safe only because the own-MD gate screens every promotion (a collapsed
 warm start is rejected, not deployed).
@@ -76,7 +84,9 @@ file**: the loop's data contract is DFT energies and forces in extended-XYZ
 (`REF_energy` / `REF_forces` keys), and its gates test forces and dynamics, so another
 model family could be trained by swapping this module while keeping the loop unchanged.
 
-## Validate — `cp2k_forge.validate`
+## Validate
+
+*Code:* `cp2k_forge.validate`
 
 Validation separates three different jobs, and keeping them separate is the design:
 
@@ -86,7 +96,7 @@ Validation separates three different jobs, and keeping them separate is the desi
   candidate itself. Force error is an entry condition, not the deployment criterion,
   because unstable dynamics can hide behind a good aggregate force score.
 - **Convergence** (may the campaign stop?) is the pre-registered plateau rule on
-  held-out force RMSE — see [Validation and gates](validation.md).
+  held-out force RMSE; see [Validation and gates](validation.md).
 - **Diagnostics** (how good is it, physically?) are RDF and VDOS comparisons, reported
   after deployment but never used as gates.
 
@@ -110,6 +120,6 @@ a torch-free regression test, so the reference numbers are consistent everywhere
 No starting configuration has to be supplied manually: each configured state point can
 seed a short foundation-model trajectory, so the only geometric input is the cell and
 composition. A prepared structure is still accepted through `system.seed_xyz` when an
-exact starting cell matters — the fluoride case study adopts the published 193-atom cell
+exact starting cell matters: the fluoride case study adopts the published 193-atom cell
 this way, and the shipped examples (`examples/water32.xyz`, `examples/water64.xyz`) do
 the same for water.

@@ -1,14 +1,13 @@
-# Case studies
+# Overview
 
 These pages document the two validation campaigns from the accompanying MPhil report
 (*Machine-Learned Interatomic Potentials in CP2K with GPU Acceleration, MACE Integration
-and CP2K-FORGE for Domain-Specific Models*, University of Cambridge, 2026, Chapter 4) —
-with the report's figures and the raw data files vendored into this repository
+and CP2K-FORGE for Domain-Specific Models*, University of Cambridge, 2026, Chapter 4), with the report's figures and the raw data files vendored into this repository
 ([provenance manifest](../assets/README.md), CC BY 4.0).
 
 Both campaigns ran **the same code and promotion logic**, differing only in
 system-specific thresholds and sampling settings, and both were labelled at hybrid
-**revPBE0-D3** (ADMM, truncated Coulomb — the level now shipped as
+**revPBE0-D3** (ADMM, truncated Coulomb; the level now shipped as
 `configs/water_hybrid.yaml` via [`dft.mode: hybrid`](../guide/hybrid-dft.md)). In both,
 the campaign stopped by the **pre-registered convergence rule**, not by the available
 compute budget: gates, validation sets, thresholds and the bootstrap seed were fixed
@@ -34,12 +33,11 @@ and F-H solvation-shell structure yet contributes little to aggregate force scor
   regime, not universal transferability.
 - **Committee route costs are extrapolations** from this work's per-single-point
   cost, not measurements of the original work.
-- The default selector in these campaigns was **random decorrelated frames** —
-  FPS/uncertainty selectors are drop-in options, *not benchmarked* at matched budget.
+- The default selector in these campaigns was **random decorrelated frames** (FPS/uncertainty selectors are drop-in options, *not benchmarked* at matched budget.
 - Each system is **one campaign**: the pass sequence cannot isolate sampler, label
   count and retraining as separate variables.
 - What a forged model *enables* in CP2K (mixed DFT/MLP, QM/MM, path integrals,
-  enhanced sampling) is **enabled, not measured** — no such production run is
+  enhanced sampling) is **enabled, not measured**: no such production run is
   claimed.
 - Density and TMD claims follow the audited language described in
   [Showcase and density](../guide/showcase-density.md).

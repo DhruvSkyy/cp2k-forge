@@ -1,9 +1,13 @@
+---
+orphan: true
+---
+
 # Vendored report assets
 
 Figures and raw data behind the documentation's case studies, vendored verbatim from
 the Report 2 data package ("Report 2 data package: Machine-Learned Interatomic
 Potentials in CP2K", v1.1, 2026-08-13) and its rendered figures. They are **never
-regenerated here** — the package's `scripts/` directory holds the generators, and every
+regenerated here**: the package's `scripts/` directory holds the generators, and every
 CSV row carries a `source` column pointing at the raw run directory it came from.
 
 **License:** figures and data © 2026 Dhruv Sharma, licensed under
@@ -20,7 +24,7 @@ the files under `docs/assets/`.
 | `figures/fig_fluoride_learning.png` | `figures_rendered/ch4/` | Fluoride case study: per-pass force RMSE vs labels |
 | `figures/fig_fluoride_structure.png` | `figures_rendered/ch4/` | Fluoride case study: g_FO/g_FH/g_OO + hydrogen VDOS vs AIMD and committee |
 | `figures/fig_cost_ledger.png` | `figures_rendered/ch4/` | Cost page: labels vs committee labels vs parent-AIMD steps |
-| `figures/fig_forge_cost_curve.png` | draft figure kept with the package scripts | Cost page: accuracy vs cumulative core-hour-equivalents (orphaned draft — water series covers passes 1–3 only; fluoride complete) |
+| `figures/fig_forge_cost_curve.png` | draft figure kept with the package scripts | Cost page: accuracy vs cumulative core-hour-equivalents (orphaned draft; water series covers passes 1–3 only; fluoride complete) |
 | `figures/fig_scorecard.png` | draft figure kept with the package scripts | Cost page: Schran-style score bars (orphaned draft, kept for talks) |
 | `figures/fig_water_density_isobar.png` | `figures_rendered/appendix/` | Density page: equilibrium density vs temperature, own-DFT reference band only |
 | `figures/fig_systems.png` | `figures_rendered/ch4/` | Case-studies index: the two simulation cells |
@@ -40,4 +44,4 @@ the files under `docs/assets/`.
 | `data/cost/backends_table_data.csv` | `data/aggregated/` | Backend comparison table data |
 | `data/cost/gpu_isocost_data.csv` | `data/aggregated/` | GPU/CPU iso-cost throughput measurements (feeds `fig_gpu_isocost.png`) |
 | `data/density/results_rho_t.csv` | `data/aggregated/rhoT/` | All 49 barostat-free NVT P(rho)=0 crossings |
-| `data/density/tmd.json` | `data/aggregated/rhoT/` | Density-maximum fit record — its verdict field is the authority on what may be claimed (UNRESOLVED) |
+| `data/density/tmd.json` | `data/aggregated/rhoT/` | Density-maximum fit record; its verdict field is the authority on what may be claimed (UNRESOLVED) |

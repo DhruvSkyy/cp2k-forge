@@ -10,7 +10,7 @@ cp2k-forge --check
 ```
 
 This prints a PASS/WARN/FAIL table covering Python, every dependency, the CP2K binary
-and data files, the trainer binary, the device, and the output directory — with an exact
+and data files, the trainer binary, the device, and the output directory, with an exact
 fix for every problem. It works even before the `[train]` extra is installed (dependency
 probing uses import metadata, not imports). The driver also runs it automatically at
 start-up and aborts before any compute if something is missing (`--no-check` bypasses).
@@ -24,7 +24,7 @@ structure.
 cp2k-forge --config configs/smoke.yaml
 ```
 
-This runs the complete loop — generate → subsample → label → train → validate — in
+This runs the complete loop (generate → subsample → label → train → validate) in
 about two minutes on a laptop CPU. Labels come from the cached foundation calculator
 (`dft.backend: mock_foundation`) instead of DFT, so it proves your install end-to-end
 without CP2K. **Plumbing only, never science.** Expected outcome: one pass completes, a
@@ -40,7 +40,7 @@ cp2k-forge --config configs/water.yaml
 
 `configs/water.yaml` is a semi-local revPBE-D3 water campaign;
 `configs/water_hybrid.yaml` is the hybrid revPBE0-D3 level used by the
-[case studies](../case-studies/index.md). Edit one file to retarget the pipeline — DFT
+[case studies](../case-studies/index.md). Edit one file to retarget the pipeline: DFT
 level, explore grid, model size, convergence rule
 ([configuration reference](../guide/configuration.md)).
 
@@ -50,7 +50,7 @@ so a killed job continues where it stopped and never recomputes a label.
 
 ### Shrink a real campaign into a smoke test
 
-Any config can be shrunk on the command line without editing it — `--set` overrides are
+Any config can be shrunk on the command line without editing it. `--set` overrides are
 also how ablation arms stay "identical by construction":
 
 ```bash
@@ -61,8 +61,8 @@ cp2k-forge --config configs/water.yaml \
 
 ## Where next
 
-- [CP2K as a dependency](cp2k-dependency.md) — how the binary and its data files are
+- [CP2K as a dependency](cp2k-dependency.md): how the binary and its data files are
   found, and what to export on a cluster.
-- [Campaigns on HPC](../guide/campaigns-hpc.md) — splitting CPU labelling from GPU
+- [Campaigns on HPC](../guide/campaigns-hpc.md): splitting CPU labelling from GPU
   training, scratch directories, the batch-job template.
-- [Case studies](../case-studies/index.md) — what a finished campaign looks like.
+- [Case studies](../case-studies/index.md): what a finished campaign looks like.

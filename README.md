@@ -9,7 +9,7 @@ in CP2K*) forges a small, fast, **system-specific**
 [MACE](https://github.com/ACEsuit/mace) potential from a MACE foundation model, with
 [CP2K](https://www.cp2k.org) as the DFT labelling engine. The foundation model is used
 **only as a structure generator**; the physics comes entirely from DFT single points
-computed by CP2K — semi-local GGA out of the box, or hybrid revPBE0-D3 under ADMM
+computed by CP2K: semi-local GGA out of the box, or hybrid revPBE0-D3 under ADMM
 (`dft.mode: hybrid`). Pure Python 3.9+; CP2K is a runtime dependency, executed as a
 subprocess and never linked.
 
@@ -43,20 +43,20 @@ python -m http.server -d docs/_build/dirhtml 8000
 Start with *Getting started → CP2K as a dependency* for exactly how the CP2K coupling
 works, and *Case studies* for the validated campaigns.
 
-## What this is — and is not
+## What this is, and is not
 
 - **Foundation model = sampler only.** Run MD with a foundation model (plus D3 where
   the system needs it) to generate diverse, physically-sensible structures. Keep the
   structures, discard its energies.
 - **Labels = real DFT.** Every training structure gets a CP2K single point at your
-  chosen level — e.g. revPBE-D3, or hybrid revPBE0-D3 via `dft.mode: hybrid`.
+  chosen level, e.g. revPBE-D3, or hybrid revPBE0-D3 via `dft.mode: hybrid`.
 - **Model = trained from scratch.** A fresh, compact MACE learns only from the DFT
   labels, so its physics is purely the labelling functional.
 - **NOT distillation** (the foundation model never labels), **NOT fine-tuning** (no
   inherited weights), **NOT query-by-committee** (the default selector draws random
   time-decorrelated frames).
 
-The D3 correction on the generator is **mandatory for water** — raw MACE-MP-0 has no
+The D3 correction on the generator is **mandatory for water**: raw MACE-MP-0 has no
 dispersion and the liquid evaporates (density collapses to ~0.72 g/cm^3).
 
 ## Install
@@ -81,7 +81,7 @@ On a GPU node, install the torch wheel matching your driver explicitly (never gu
 
 ## CP2K is the labelling engine (a runtime dependency)
 
-CP2K is never imported or linked — it is executed as a subprocess on generated input
+CP2K is never imported or linked; it is executed as a subprocess on generated input
 files, so any working CP2K binary (>= 2023.x, with libdftd3 support compiled in, as all
 standard builds have) works. Install it however you prefer:
 
@@ -96,7 +96,7 @@ on a laptop or any cluster:
 | variable             | purpose                                                                                                                                             |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CP2K_BIN`           | path to the CP2K binary used for DFT labelling (default: `dft.cp2k_bin`, i.e. `cp2k.psmp` on PATH)                                                 |
-| `CP2K_DATA_DIR`      | directory with `BASIS_MOLOPT`, `GTH_POTENTIALS`, `dftd3.dat` (plus `BASIS_ADMM`, `t_c_g.dat` for `dft.mode: hybrid`); may stay **unset** for a standard install — it is derived from the binary's location |
+| `CP2K_DATA_DIR`      | directory with `BASIS_MOLOPT`, `GTH_POTENTIALS`, `dftd3.dat` (plus `BASIS_ADMM`, `t_c_g.dat` for `dft.mode: hybrid`); may stay **unset** for a standard install; it is derived from the binary's location |
 | `CP2K_MPI_LAUNCHER`  | `mpirun` (default) or `none` for an OMP-only (`.ssmp`) build                                                                                        |
 | `CP2K_RANKS`         | MPI ranks per DFT single point                                                                                                                      |
 | `CP2K_OMP_THREADS`   | OMP threads per rank (default: auto from the allocated cores)                                                                                       |
@@ -206,8 +206,7 @@ CI runs the tests on Python 3.10/3.12 plus a strict docs build on every push.
 ## Method and implementation notes
 
 See [docs/about/method.md](docs/about/method.md) for the design rationale, the
-stage-by-stage data flow (which module owns which stage), and the known physics caveats
-— or the same page rendered in the documentation site.
+stage-by-stage data flow (which module owns which stage), and the known physics caveats. The same page is also in the documentation site.
 
 ## Provenance
 

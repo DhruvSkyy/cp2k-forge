@@ -53,132 +53,98 @@ about/method
 about/provenance
 about/changelog
 about/license
-assets/README
 ```
 
 # CP2K-FORGE
 
-<header class="research-hero">
-  <div class="research-hero__text">
-    <p class="document-type">Research software documentation</p>
-    <h1>CP2K-FORGE</h1>
-    <p class="expansion">Foundation-model Optimisation of Reference Generation and Evaluation in CP2K</p>
-    <p class="abstract">A CP2K-centred route to compact, system-specific MACE potentials. A foundation model proposes configurations, CP2K labels selected frames with density functional theory, and fixed accuracy and stability checks decide whether the trained model can be deployed.</p>
-    <nav class="hero-links" aria-label="Primary documentation links">
-      <a href="getting-started/installation/">Installation</a>
-      <a href="getting-started/quickstart/">Quickstart</a>
-      <a href="guide/how-it-works/">Method</a>
-      <a href="case-studies/">Validation study</a>
-      <a href="reference/cli/">CLI reference</a>
-    </nav>
-    <div class="project-meta">
-      <span>Python 3.9+</span>
-      <span>MIT licence</span>
-      <a href="https://github.com/DhruvSkyy/cp2k-forge">GitHub repository</a>
-      <a href="about/provenance/">Thesis and citation</a>
-    </div>
-  </div>
-  <figure class="research-hero__figure">
-    <img src="_images/fig_systems.png" alt="The bulk-water and fluoride-in-water validation cells used in the reported study">
-    <figcaption>Figure 1. The two validation systems used in the accompanying MPhil study: 64 water molecules, and one fluoride ion in 64 water molecules.</figcaption>
-  </figure>
-</header>
+<p class="lede">Build a small, fast MACE potential for <em>your</em> system, trained only on CP2K DFT labels.</p>
 
-<div class="purpose-statement">
-  <span>Purpose</span>
-  <p>To build accurate, data-efficient potentials whose labelling, validation and deployed molecular dynamics remain inside one reproducible CP2K workflow.</p>
-</div>
+<p class="expansion">Foundation-model Optimisation of Reference Generation and Evaluation in CP2K</p>
 
-## Overview
+<nav class="hero-actions" aria-label="Start here">
+  <a class="primary" href="getting-started/quickstart/">Get started</a>
+  <a href="guide/how-it-works/">How it works</a>
+  <a href="case-studies/">See the results</a>
+</nav>
 
-Machine-learned interatomic potentials extend first-principles accuracy to longer molecular-dynamics simulations, but their reliability depends on consistent labelling, inference and validation. CP2K-FORGE brings these stages into one route. It uses CP2K Quickstep for the reference calculations, trains a compact MACE on the selected labels, and returns the candidate to CP2K for validation and deployment.
+<p class="project-meta">
+  <span>Python 3.9+</span>
+  <span>MIT licence</span>
+  <span>CP2K is a runtime dependency, never linked</span>
+  <a href="https://github.com/DhruvSkyy/cp2k-forge">GitHub</a>
+</p>
 
-The foundation model is a sampler, not a teacher. Its trajectories provide candidate structures, but its predicted energies and forces are discarded. Every retained configuration is relabelled at the target DFT level. The final model therefore learns from CP2K labels alone and does not inherit the foundation model’s weights.
+## What it does
 
-## Method
+You write one YAML file describing your system. CP2K-FORGE then:
 
-One YAML file defines the system, state points, DFT labelling level, compact-MACE recipe, validation gates and convergence rule. The campaign then repeats five stages.
+<ul class="key-points">
+  <li><strong>Samples structures with a foundation model.</strong> A general model such as MACE-MP-0 runs short MD to propose realistic configurations. Its energies and forces are thrown away.</li>
+  <li><strong>Labels them with CP2K.</strong> Every kept structure gets a DFT single point (semi-local GGA, or hybrid revPBE0-D3). These labels are the only training data.</li>
+  <li><strong>Trains a compact MACE from scratch.</strong> No weights are inherited, so the model's physics is exactly the DFT level you chose.</li>
+</ul>
+
+This is not distillation, not fine-tuning and not query-by-committee. The loop repeats until a convergence rule, fixed before the campaign starts, says more labels no longer help.
+
+## The loop
 
 <ol class="method-sequence">
-  <li><span>01</span><div><h3>Sample</h3><p>Run short trajectories across the configured state points, first with a foundation model and later with the accepted compact model.</p></div></li>
-  <li><span>02</span><div><h3>Select</h3><p>Remove time-correlated frames and select a small batch for reference calculations.</p></div></li>
-  <li><span>03</span><div><h3>Label</h3><p>Evaluate independent CP2K DFT single points. These are the only energies and forces used for training.</p></div></li>
-  <li><span>04</span><div><h3>Train</h3><p>Fit the fixed compact-MACE recipe to the accumulated labels and export it for CP2K.</p></div></li>
-  <li><span>05</span><div><h3>Validate</h3><p>Test held-out forces, short-range behaviour and stability in dynamics driven by the candidate itself.</p></div></li>
+  <li><span>1</span><div><h3>Sample</h3><p>Short MD across your state points. Pass 1 uses the foundation model; later passes use the latest accepted compact model.</p></div></li>
+  <li><span>2</span><div><h3>Select</h3><p>Drop time-correlated frames and pick a small batch.</p></div></li>
+  <li><span>3</span><div><h3>Label</h3><p>Run independent CP2K single points, in parallel.</p></div></li>
+  <li><span>4</span><div><h3>Train</h3><p>Fit the compact MACE and export it for CP2K.</p></div></li>
+  <li><span>5</span><div><h3>Validate</h3><p>Accept the model only if forces improve <em>and</em> its own MD stays stable.</p></div></li>
 </ol>
 
-The campaign continues until the pre-specified plateau rule fires or the label budget is reached. State is written after every stage, so CPU labelling and GPU training can run as separate jobs and an interrupted campaign resumes without repeating completed calculations.
-
-<div class="docs-entry">
-  <div>
-    <h3>Run a campaign</h3>
-    <p>Install the package, check the environment and execute the complete mock workflow without CP2K or a GPU.</p>
-    <a href="getting-started/quickstart/">Quickstart →</a>
-  </div>
-  <div>
-    <h3>Inspect the method</h3>
-    <p>Follow the control flow from the configuration file to the campaign manifest and accepted model.</p>
-    <a href="guide/how-it-works/">How it works →</a>
-  </div>
-  <div>
-    <h3>Reproduce the study</h3>
-    <p>Read the water and fluoride campaigns with their provenance, costs, raw values and stated limitations.</p>
-    <a href="case-studies/">Case studies →</a>
-  </div>
-</div>
+State is saved after every stage, so labelling (CPU) and training (GPU) can run as separate jobs, and a killed campaign resumes without recomputing anything.
 
 ## Results
 
-The workflow was tested on bulk water and fluoride in water with the same code and promotion logic. Both campaigns used hybrid revPBE0-D3 labels and stopped through the fixed convergence rule rather than at the compute limit. The comparison below is deliberately restricted to the shared ambient target; the published committee models cover a wider range of aqueous conditions.
+Tested on bulk water and on fluoride in water, both labelled at hybrid revPBE0-D3 and compared with a published committee potential at the same level of theory. Both campaigns were stopped by the pre-registered convergence rule, not by the compute budget.
 
-<div class="evidence-layout">
-  <div>
-    <table class="academic-results">
-      <thead><tr><th>System and measure</th><th>CP2K-FORGE</th><th>Committee</th></tr></thead>
-      <tbody>
-        <tr class="table-section"><th colspan="3">Bulk water</th></tr>
-        <tr><td>Training labels</td><td>89</td><td>814</td></tr>
-        <tr><td>Force RMSE, 55 shared frames</td><td>53.3 meV Å<sup>−1</sup></td><td>64.6 meV Å<sup>−1</sup></td></tr>
-        <tr><td>RDF overlap with 298 K experiment</td><td>95.6%</td><td>95.6%</td></tr>
-        <tr class="table-section"><th colspan="3">Fluoride in water</th></tr>
-        <tr><td>Training labels</td><td>64</td><td>299</td></tr>
-        <tr><td>Force RMSE, 37 shared frames</td><td>57.7 meV Å<sup>−1</sup></td><td>69.4 meV Å<sup>−1</sup></td></tr>
-        <tr><td>RDF / VDOS overlap with AIMD</td><td>97.2 / 98.7%</td><td>97.7 / 97.7%</td></tr>
-      </tbody>
-    </table>
-    <p class="table-caption">Table 1. Reported hybrid revPBE0-D3 results. Force comparisons use the same held-out frames for each pair of models.</p>
-  </div>
-  <figure>
-    <img src="_images/fig_forge_cost_curve.png" alt="Held-out force RMSE against cumulative build cost for water and fluoride campaigns">
-    <figcaption>Figure 2. Held-out force error against cumulative build cost. Error bars are bootstrap uncertainties.</figcaption>
-  </figure>
+<div class="table-scroll">
+<table class="academic-results">
+  <thead><tr><th>System and measure</th><th>CP2K-FORGE</th><th>Committee</th></tr></thead>
+  <tbody>
+    <tr class="table-section"><th colspan="3">Bulk water</th></tr>
+    <tr><td>Training labels</td><td>89</td><td>814</td></tr>
+    <tr><td>Force RMSE, 55 shared frames</td><td>53.3 meV/Å</td><td>64.6 meV/Å</td></tr>
+    <tr><td>RDF overlap with 298 K experiment</td><td>95.6%</td><td>95.6%</td></tr>
+    <tr class="table-section"><th colspan="3">Fluoride in water</th></tr>
+    <tr><td>Training labels</td><td>64</td><td>299</td></tr>
+    <tr><td>Force RMSE, 37 shared frames</td><td>57.7 meV/Å</td><td>69.4 meV/Å</td></tr>
+    <tr><td>RDF / VDOS overlap with AIMD</td><td>97.2 / 98.7%</td><td>97.7 / 97.7%<sup>*</sup></td></tr>
+  </tbody>
+</table>
 </div>
+<p class="table-caption">Force errors compare both models on the same held-out frames. <sup>*</sup>Committee's 11 ps run, length-matched to this work's 10 ps run.</p>
 
-### Why force error is not enough
+```{figure} assets/figures/fig_forge_cost_curve.png
+:alt: Held-out force RMSE falling as cumulative build cost grows, for the water and fluoride campaigns
+:class: figure-narrow
 
-The water campaign showed why a force score cannot be the deployment criterion. Some warm-started candidates fitted held-out forces well and then collapsed in molecular dynamics. A candidate is therefore promoted only if it improves the frozen force set, passes a compressed-dimer screen and survives a short CP2K trajectory driven by its own forces. RDF and VDOS comparisons remain post-deployment diagnostics.
+Held-out force error against cumulative build cost. Error bars are bootstrap uncertainties.
+```
 
-<div class="note-grid">
-  <section>
-    <h3>Demonstrated</h3>
-    <p>Selected DFT labelling, compact-MACE training, conservative promotion, convergence detection, resumability and deployment through the CP2K force interface.</p>
-  </section>
-  <section>
-    <h3>Outstanding checks</h3>
-    <p>The two campaigns do not establish universal transferability. Density at the hybrid level and a species-weighted fluoride convergence rule remain to be tested.</p>
-  </section>
-</div>
+A low force error alone is not enough. In the water campaign some candidates fitted forces well and then fell apart in MD. That is why a model is only accepted after it also passes a short-range (compressed dimer) check and a stability run driven by its own forces. Details: [Validation and gates](guide/validation.md).
 
-## Installation
+**Not yet shown:** two systems do not establish general transferability. Density at the hybrid level and a species-weighted convergence rule for fluoride are still to be tested.
+
+## Try it in two minutes
+
+No CP2K or GPU needed. The smoke config replaces DFT with mock labels to exercise the full loop:
 
 ```bash
-pip install "cp2k-forge[train]"
+git clone https://github.com/DhruvSkyy/cp2k-forge.git
+cd cp2k-forge
+python -m pip install -U pip
+pip install -e ".[train]"
 cp2k-forge --check
 cp2k-forge --config configs/smoke.yaml
 ```
 
-The smoke configuration exercises the complete orchestration path on a laptop in about two minutes, using mock labels instead of CP2K. For a scientific campaign, continue with the [installation guide](getting-started/installation.md), [CP2K dependency notes](getting-started/cp2k-dependency.md) and [HPC guide](guide/campaigns-hpc.md).
+For a real campaign, continue with [Installation](getting-started/installation.md), [CP2K as a dependency](getting-started/cp2k-dependency.md) and [Campaigns on HPC](guide/campaigns-hpc.md).
 
-## Citation and provenance
+## Citation
 
-CP2K-FORGE was developed by Dhruv Sharma as part of the 2026 MPhil in Scientific Computing at the University of Cambridge. The methodology, validation protocol, results and limitations are documented in *Machine-Learned Interatomic Potentials in CP2K*. See [provenance and citation](about/provenance.md) for the research chronology and citation record.
+Developed by Dhruv Sharma for the MPhil in Scientific Computing, University of Cambridge (2026). The method, validation protocol, results and limitations are in the thesis *Machine-Learned Interatomic Potentials in CP2K with GPU Acceleration, MACE Integration and CP2K-FORGE for Domain-Specific Models*. See [Provenance and citation](about/provenance.md).

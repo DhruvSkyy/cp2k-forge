@@ -11,7 +11,7 @@ code.
 A candidate model is promoted (deployed as the next explorer) only if it
 
 1. **lowers held-out force RMSE** relative to the incumbent promoted model;
-2. **passes a dimer-compression screen** — the dimer energy curve must stay repulsive at
+2. **passes a dimer-compression screen**: the dimer energy curve must stay repulsive at
    short range (the case-study campaigns used floors of −1.2 eV for water and −0.85 eV
    for fluoride); this excludes qualitatively attractive short-range behaviour that a
    tiny dataset cannot rule out;
@@ -30,7 +30,7 @@ alone would have promoted an unstable water model
 The sampler-promotion gate (`loop.promote_min_force_pct`,
 `loop.promote_density_window_gcc`) adds one more protection: the explorer switches from
 the foundation model to a trained model only once that model's validation clears the
-bar — an undertrained model must not explore unsupervised.
+bar: an undertrained model must not explore unsupervised.
 
 ## Convergence: a pre-registered plateau rule
 
@@ -54,12 +54,12 @@ edges 1.86 and 1.51.
 
 `subsample.min_frames` is a validity floor: a pass that labels fewer frames is never
 deployed and never plotted, but it still enters the pass-to-pass improvement
-sequence the rule tracks. The rule does not require the curve to be flat — it stops
+sequence the rule tracks. The rule does not require the curve to be flat; it stops
 when the certified improvement is smaller than the pre-set band.
 :::
 
 Two cheaper stops complement the rule: `loop.min_rel_improvement_force` (quit when a
-pass buys less than a set *fraction* of improvement — extra labels are not buying
+pass buys less than a set *fraction* of improvement, because extra labels are not buying
 accuracy) and `loop.max_passes` / `loop.max_wall_hours` (the budget).
 
 ## Diagnostics: the scorecard
@@ -67,7 +67,7 @@ accuracy) and `loop.max_passes` / `loop.max_wall_hours` (the budget).
 After each pass, `validate.validate_model` writes `scorecard.md` into the pass
 directory: held-out force RMSE (fixed and incremental test sets), DFT spot-checks on the
 model's own dynamics, RDF and VDOS scores, a density probe, stability minima, and
-experimental anchors (reported, never gated — classical nuclei at a given functional
+experimental anchors (reported, never gated; classical nuclei at a given functional
 should not reproduce experiment exactly).
 
 Scores follow the Schran-style conventions, where the reference RMS force sets the

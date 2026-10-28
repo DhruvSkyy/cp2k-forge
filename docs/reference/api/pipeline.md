@@ -1,4 +1,4 @@
-# API — pipeline stages
+# Python API: pipeline stages
 
 The loop's five stages, one module each, in execution order. The driver
 (`cp2k_forge.cli`) sequences them; each consumes and produces extended-XYZ plus manifest

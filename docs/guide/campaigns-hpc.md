@@ -3,14 +3,14 @@
 The pipeline is machine-agnostic by construction: everything site-specific travels
 through [environment variables](../getting-started/cp2k-dependency.md#the-environment-variables),
 so one config runs unchanged on a laptop or any scheduler. `example_job.sh` in the repo
-root is a deliberately scheduler-free batch template — adapt the marked lines
+root is a deliberately scheduler-free batch template; adapt the marked lines
 (SLURM/PBS/LSF/local) and submit.
 
 ## Resumability is the default
 
 Every stage transition persists to `<workdir>/manifest.json`, and every finished DFT
 single point is keyed by a structure hash. Re-running the same command therefore
-continues from the last completed stage and **never recomputes a finished label** — a
+continues from the last completed stage and **never recomputes a finished label**: a
 walltime kill costs you nothing but the stage in flight. Run the preflight up front so a
 misconfigured job fails in seconds, not hours:
 
@@ -28,7 +28,7 @@ separate jobs on different nodes; the manifest hands over state between them:
 # CPU node (needs CP2K; also computes the isolated-atom E0s)
 cp2k-forge --config configs/water.yaml --stop-after label
 
-# GPU node (does NOT need CP2K — the preflight knows this and will not fail it)
+# GPU node (does NOT need CP2K; the preflight knows this and will not fail it)
 cp2k-forge --config configs/water.yaml
 ```
 
@@ -59,13 +59,13 @@ DFT single points are independent, so they parallelise two ways:
   chew through the same pass.
 
 Because the labels parallelise, a converged model arrives with far lower wall time than
-the ab initio trajectory it replaces — the case-study campaigns each cost roughly a
+the ab initio trajectory it replaces: the case-study campaigns each cost roughly a
 thousand core-hours of DFT plus tens of A100-hours for the whole loop
 ([cost ledger](../case-studies/cost.md)).
 
 ## Ablation arms without config drift
 
-`--set` overrides make arms identical by construction — one config file, each arm
+`--set` overrides make arms identical by construction: one config file, each arm
 differing only in its command line:
 
 ```bash

@@ -2,25 +2,25 @@
 
 **The efficiency claim is deliberately narrow: the repeated cost is the CP2K label, not
 a parent trajectory.** The accepted models use 89 (water) and 64 (fluoride) target-level
-labels against 814 and 299 structures in the published committee models — and no parent
+labels against 814 and 299 structures in the published committee models, and no parent
 ab initio trajectory at all.
 
-*(Report 2 §4.3.3; raw data:
+*(Thesis §4.3.3, see [provenance](../about/provenance.md); raw data:
 [`forge_cost_curve.csv`](../assets/data/cost/forge_cost_curve.csv),
 [`mace_steptime_data.csv`](../assets/data/cost/mace_steptime_data.csv),
 [`backends_table_data.csv`](../assets/data/cost/backends_table_data.csv).)*
 
 ![Cost ledger](../assets/figures/fig_cost_ledger.png)
 
-*Retained-label cost of the two routes. The third bar per system — the parent AIMD
-trajectory (600,000 / 104,000 steps) — is the cost this workflow removes entirely.*
+*Retained-label cost of the two routes. The third bar per system (the parent AIMD
+trajectory (600,000 / 104,000 steps) is the cost this workflow removes entirely.*
 
 :::{admonition} Extrapolation, clearly labelled
 :class: note
 
 The committee-route costs are **extrapolations from this work's measured
 per-single-point cost**, not measurements of the original work (≈8,600 / ≈3,700
-core-h for labels alone; parent AIMD of order 10⁶ core-h) — order-of-magnitude
+core-h for labels alone; parent AIMD of order 10⁶ core-h), order-of-magnitude
 statements, not benchmarks.
 :::
 
@@ -43,7 +43,7 @@ excluded; GPU rows are campaign means, labelling totals from per-frame costs):
 Two structural facts fall out of the ledger. First, **the loop machinery is cheap next
 to the labels**: the whole 8-pass fluoride GPU budget is worth about 90 hybrid single
 points, and sampling cost is the same whether the foundation model or the compact model
-explores — so the on-policy structural recovery in the
+explores, so the on-policy structural recovery in the
 {ref}`fluoride study <fluoride-on-policy-recovery>` came
 essentially free. Second, GPU cost per pass stays roughly **flat** as the label set
 grows; the operational bottleneck is deciding how many expensive target-level labels to
@@ -51,7 +51,7 @@ acquire, not retraining. A hybrid label is itself the premium: the semi-local le
 ~13× cheaper per single point (~0.95 core-h), which is what makes
 [`dft.mode`](../guide/hybrid-dft.md) the campaign's main cost dial.
 
-Because the labels are independent single points, they parallelise across nodes — a
+Because the labels are independent single points, they parallelise across nodes: a
 converged model arrives at far lower *wall time* than the ab initio dynamics it
 replaces.
 
@@ -82,7 +82,7 @@ compact models and both committees against the same ab initio references:
 
 The compact recipe pays off at inference: in MD on one A100 (193-atom cell), the
 accepted compact model runs at **53 ms/step (0.81 ns/day)** against **137 ms/step
-(0.32 ns/day)** for the foundation sampler it replaced — **2.6× faster**, measured with
+(0.32 ns/day)** for the foundation sampler it replaced: **2.6× faster**, measured with
 [`showcase/bench_throughput.py`](../guide/showcase-density.md#throughput). The vendored
 `mace_steptime_data.csv` / `backends_table_data.csv` carry the broader backend
 measurements behind the report's engine chapters (per-run uncertainty kinds included).

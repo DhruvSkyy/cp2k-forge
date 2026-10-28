@@ -1,4 +1,4 @@
-# API — config and I/O
+# Python API: config and I/O
 
 The data layer: campaign configuration, CP2K input/output, units, the dataset file and
 the run-state machine.

@@ -1,4 +1,4 @@
-# API — environment and engines
+# Python API: environment and engines
 
 The runtime layer: the CLI driver, the preflight doctor, CP2K discovery, the MD engines
 and the stage timers.

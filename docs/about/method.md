@@ -1,4 +1,4 @@
-# CP2K-FORGE: method notes
+# Design rationale
 
 CP2K-FORGE is an automated pipeline that turns a general-purpose MACE foundation model
 (such as MACE-MP-0) into a small, fast, **system-specific** MACE interatomic potential at
@@ -52,7 +52,7 @@ and persists progress after each one.
 | Generate  | `generate.build_explorer`, `generate.generate_frames` | MD over a temperature/density grid using an ASE + mace-torch engine (`engines.ASEMaceEngine`). Trajectories are decorrelated (`decorrelation`) so only time-independent frames survive.                                             |
 | Subsample | `subsample.subsample` (+ `direct`)                    | Diversity selection (DIRECT: foundation-model features -> PCA -> KMeans, or farthest-point sampling) picks the minimal spanning set, so the DFT budget is spent on distinct structures.                                             |
 | Label     | `label.label_frames`, `cp2k_io`, `e0s`                | Writes a CP2K single-point input per structure (`cp2k_io.write_singlepoint_input`), runs CP2K, and parses the log (`cp2k_io.parse_singlepoint_output`). Isolated-atom reference energies (E0s) are computed once at the same level. |
-| Train     | `train.train_from_scratch`                            | Wraps `mace_run_train` to fit a fresh compact MACE (small `num_channels`/`max_ell`/`r_max` — the speed claim depends on this).                                                                                                      |
+| Train     | `train.train_from_scratch`                            | Wraps `mace_run_train` to fit a fresh compact MACE (small `num_channels`/`max_ell`/`r_max`, the speed claim depends on this).                                                                                                      |
 | Validate  | `validate.validate_model`                             | Held-out force RMSE plus RDF/VDOS self-convergence scores, and an NPT density probe.                                                                                                                                                |
 | Showcase  | `showcase/run_isobar.py`, `showcase/density_tmd.py`   | Runs the 1 atm density isobar and analyses the density-maximum region.                                                                                                                                                       |
 
@@ -80,7 +80,7 @@ stage across separate jobs (`cp2k-forge --stop-after label`).
   test set (a constant yardstick across passes).
 - **Physical fidelity** is the showcase: the 1 atm density isobar with block-statistics
   error bars, read against the labelling functional's own reference (never against
-  experiment — see the claim constraints in the Showcase guide).
+  experiment, see the claim constraints in the Showcase guide).
 
 ## A physics caveat worth stating
 

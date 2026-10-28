@@ -1,13 +1,13 @@
 # Fluoride in water
 
-**Headline: a competitive charged-cell model from 64 labels — about a fifth of the
-committee's target-level labels — with the campaign's most instructive lesson: labels
+**Headline: a competitive charged-cell model from 64 labels (about a fifth of the
+committee's target-level labels) with the campaign's most instructive lesson: labels
 alone are not enough; *where* they are sampled controls the observables.**
 
 The system is the published single-fluoride-in-64-water cell: 193 atoms in a 12.445 Å
 cube, adopted exactly via `system.seed_xyz`. It is stringent because the chemically
 important signal concentrates around one ion that contributes little to aggregate force
-scores. *(Report 2 §4.3.2; raw data:
+scores. *(Thesis §4.3.2, see [provenance](../about/provenance.md); raw data:
 [`convergence.json`](../assets/data/fluoride/convergence.json),
 [`gates_by_pass.json`](../assets/data/fluoride/gates_by_pass.json),
 [`species_by_pass.json`](../assets/data/fluoride/species_by_pass.json),
@@ -32,20 +32,20 @@ pre-registered 2.0 meV/Å band. Pass 8 is a convergence decision, not a manual c
 ![Fluoride learning curve](../assets/figures/fig_fluoride_learning.png)
 
 (fluoride-on-policy-recovery)=
-## The on-policy recovery — the pass history is the result
+## The on-policy recovery: the pass history is the result
 
 During the five foundation-sampled passes, labels improve held-out forces by 27% (86.3 →
 63.0 meV/Å) while the five-pair RDF agreement with the revPBE0-D3 AIMD reference
 **drifts down, 95.3 → 93.4%**: the labels are target-level, but not yet spent in the
 region that controls the solvation-shell observables. Switching to compact-model
-sampling reverses this — the RDF overlap jumps to 96.7% and finishes at **97.2%**, with
+sampling reverses this: the RDF overlap jumps to 96.7% and finishes at **97.2%**, with
 the hydrogen VDOS following to **98.7%**.
 
 > The sampler can find candidate regions at low cost, but the deployed model eventually
 > has to sample the distribution on which it will be judged.
 
 The recovery has the expected locality (the solvent network gains most; F-O and F-H
-improve more slowly — one fluoride provides few shell configurations per frame), and
+improve more slowly; one fluoride provides few shell configurations per frame), and
 robustness improves alongside: two of eight velocity seeds failed a mid-campaign screen,
 while all eight accepted pass-8 replicas run stably (closest O-O approach 2.53 Å).
 
@@ -67,7 +67,7 @@ length-matched 11 ps value (97.7) used in the table.*
 | Training labels | **64** | 299 |
 
 The most independent force check: on **298 committee-AIMD frames never used in this
-work's training, the accepted model reaches 46.8 meV/Å** — lower than on its own
+work's training, the accepted model reaches 46.8 meV/Å**, lower than on its own
 held-out frames (which, being shared, also govern convergence). The committee's RDF/VDOS
 are measured on the trajectory its training set was drawn from, so those observables are
 not fully out-of-sample for it.
@@ -77,7 +77,7 @@ not fully out-of-sample for it.
 - **The species breakdown is uneven.** The compact model is better on solvent forces;
   the committee remains better on fluorine. One ion in 193 atoms carries little weight
   in aggregate force RMSE, so **the campaign can stop while the ion force is still
-  improving fastest** — a stated limitation of the aggregate convergence rule. The
+  improving fastest**, a stated limitation of the aggregate convergence rule. The
   concrete next step is a species-weighted rule, not a new sampler.
 - **The ion shell sits slightly too close**: the first F-O and F-H peaks are one
   histogram bin nearer the ion than AIMD, and the committee keeps the better ion-centred
