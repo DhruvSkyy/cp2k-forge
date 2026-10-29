@@ -1,4 +1,4 @@
-# Showcase and density
+# Density probe
 
 The `showcase/` scripts turn an accepted model into density observables: a 1 atm isobar
 and its analysis. They are repo scripts (not part of the installed package) because they

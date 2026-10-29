@@ -64,7 +64,7 @@ pass (a crash would leave the stage machine retraining forever); the pass advanc
 an empty scorecard and a printed warning, and convergence simply cannot fire that pass.
 Check the stability gate output first: an unstable model NaN-ing its own MD is the
 usual cause, and more labels are the usual cure
-([why force scores alone mislead](validation.md#promotion-three-gates-per-candidate)).
+([why force scores alone mislead](validation.md#per-pass-checks)).
 
 **Box collapse or evaporation during exploration.** The density clamp
 (`explore.density_min_gcc` / `density_max_gcc` / `clamp_patience`) aborts such cells

@@ -19,14 +19,14 @@ subprocess and never linked.
  GENERATE --> SUBSAMPLE --> LABEL (DFT) --> TRAIN ------> converged? -+ --> SHOWCASE
  explorer     select        CP2K, GGA      compact MACE    (no)            density
  MD           decorrelated  or hybrid      on the labels                   isobar
- (pass 1: foundation model + D3; pass >=2: the latest promoted model)
+ (pass 1: foundation model + D3; later: the latest (promoted) compact model)
 ```
 
 Validated on two systems at hybrid revPBE0-D3 against a published committee potential:
 ambient water (**89 labels** vs the committee's 814; force RMSE **53.3 vs 64.6 meV/Å**
 on shared frames) and aqueous fluoride (**64 vs 299 labels; 57.7 vs 69.4 meV/Å**), both
-campaigns stopped by a pre-registered convergence rule. Full numbers, figures and raw
-data: the **Case studies** section of the documentation.
+campaigns stopped by a convergence rule fixed before use. Full numbers, figures and raw
+data: the **Results** section of the documentation.
 
 ## Documentation
 
@@ -41,7 +41,7 @@ python -m http.server -d docs/_build/dirhtml 8000
 ```
 
 Start with *Getting started → CP2K as a dependency* for exactly how the CP2K coupling
-works, and *Case studies* for the validated campaigns.
+works, and *Results* for the validated campaigns.
 
 ## What this is, and is not
 

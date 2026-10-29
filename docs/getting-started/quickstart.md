@@ -65,4 +65,4 @@ cp2k-forge --config configs/water.yaml \
   found, and what to export on a cluster.
 - [Campaigns on HPC](../guide/campaigns-hpc.md): splitting CPU labelling from GPU
   training, scratch directories, the batch-job template.
-- [Case studies](../case-studies/index.md): what a finished campaign looks like.
+- [Results](../case-studies/index.md): what a finished campaign looks like.

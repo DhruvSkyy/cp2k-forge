@@ -1,3 +1,9 @@
+---
+orphan: true
+---
+
 # Changelog
 
---8<-- "CHANGELOG.md"
+```{include} ../../CHANGELOG.md
+:start-line: 1
+```

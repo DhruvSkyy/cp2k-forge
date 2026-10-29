@@ -26,7 +26,7 @@ guide/troubleshooting
 
 ```{toctree}
 :hidden:
-:caption: Case studies
+:caption: Results
 
 case-studies/index
 case-studies/water
@@ -39,9 +39,7 @@ case-studies/cost
 :caption: Reference
 
 reference/cli
-reference/api/pipeline
-reference/api/config-io
-reference/api/environment
+reference/api
 reference/templates
 ```
 
@@ -51,8 +49,6 @@ reference/templates
 
 about/method
 about/provenance
-about/changelog
-about/license
 GitHub <https://github.com/DhruvSkyy/cp2k-forge>
 ```
 
@@ -65,13 +61,14 @@ GitHub <https://github.com/DhruvSkyy/cp2k-forge>
 <nav class="hero-actions" aria-label="Start here">
   <a class="primary" href="getting-started/quickstart/">Get started</a>
   <a href="guide/how-it-works/">How it works</a>
-  <a href="case-studies/">See the results</a>
+  <a href="case-studies/">Results</a>
 </nav>
 
 <p class="project-meta">
   <span>Python 3.9+</span>
-  <span>MIT licence</span>
+  <a href="about/license/">MIT licence</a>
   <span>CP2K is a runtime dependency, never linked</span>
+  <a href="about/changelog/">Changelog</a>
   <a href="https://github.com/DhruvSkyy/cp2k-forge">GitHub</a>
 </p>
 
@@ -97,6 +94,7 @@ dft:
   functional: revPBE
 generator:
   model: mace-mp-0          # the sampler; its labels are discarded
+  dispersion: true          # D3, needed for liquid water
 explore:
   temperatures_k: [300]
 subsample:
@@ -109,25 +107,25 @@ loop:
   min_rel_improvement_force: 0.05   # stop when a pass improves < 5%
 ```
 
-Every key is documented in the [configuration reference](guide/configuration.md).
+Every key is documented in the [configuration reference](guide/configuration.md). (The thesis water campaign sampled with MACE-OFF23 medium; the shipped config uses MACE-MP-0 with D3. Only the sampler differs; the labels are the same CP2K level.)
 
-This is not distillation, not fine-tuning and not query-by-committee. The loop repeats until a convergence rule, fixed before the campaign starts, says more labels no longer help.
+This is not distillation, not fine-tuning and not query-by-committee. The loop repeats until a stop rule set in the config says more labels no longer help, or the pass budget runs out.
 
 ## The loop
 
 <ol class="method-sequence">
-  <li><span>1</span><div><h3>Sample</h3><p>Short MD across your state points. Pass 1 uses the foundation model; later passes use the latest accepted compact model.</p></div></li>
-  <li><span>2</span><div><h3>Select</h3><p>Drop time-correlated frames and pick a small batch.</p></div></li>
+  <li><span>1</span><div><h3>Sample</h3><p>Short MD across your state points. Pass 1 uses the foundation model; later passes use the latest compact model, or, with the promotion gate on, the latest one that passed it.</p></div></li>
+  <li><span>2</span><div><h3>Select</h3><p>Thin trajectories by autocorrelation time and pick a small batch.</p></div></li>
   <li><span>3</span><div><h3>Label</h3><p>Run independent CP2K single points, in parallel.</p></div></li>
   <li><span>4</span><div><h3>Train</h3><p>Fit the compact MACE and export it for CP2K.</p></div></li>
-  <li><span>5</span><div><h3>Validate</h3><p>Accept the model only if forces improve <em>and</em> its own MD stays stable.</p></div></li>
+  <li><span>5</span><div><h3>Validate</h3><p>Score held-out forces and run short MD on the candidate's own forces; the stop rule then decides whether to continue.</p></div></li>
 </ol>
 
 State is saved after every stage, so labelling (CPU) and training (GPU) can run as separate jobs, and a killed campaign resumes without recomputing anything.
 
 ## Results
 
-Tested on bulk water and on fluoride in water, both labelled at hybrid revPBE0-D3 and compared with a published committee potential at the same level of theory. Both campaigns were stopped by the pre-registered convergence rule, not by the compute budget.
+Tested on bulk water and on fluoride in water, both labelled at hybrid revPBE0-D3 and compared with a published committee potential at the same level of theory. Both campaigns stopped by a convergence rule fixed before use (a paired-bootstrap test on held-out force error), not by the compute budget. That rule was applied with the thesis analysis scripts; see [Validation and gates](guide/validation.md) for what v0.1.0 implements.
 
 <div class="table-scroll">
 <table class="academic-results">
@@ -146,16 +144,17 @@ Tested on bulk water and on fluoride in water, both labelled at hybrid revPBE0-D
 </div>
 <p class="table-caption">Force errors compare both models on the same held-out frames. <sup>*</sup>Committee's 11 ps run, length-matched to this work's 10 ps run.</p>
 
-```{figure} assets/figures/fig_forge_cost_curve.png
-:alt: Held-out force RMSE falling as cumulative build cost grows, for the water and fluoride campaigns
-:class: figure-narrow
+A low force error alone is not enough. In the water campaign, early candidates fitted forces well and then collapsed in MD driven by their own forces:
 
-Held-out force error against cumulative build cost. Error bars are bootstrap uncertainties.
+```{figure} assets/figures/fig_water_stability.png
+:alt: Minimum oxygen-oxygen distance in a 10 ps own-MD screen for water models trained on 10 to 89 labels; models below 40 labels collapse below 1 angstrom, later models stay near 2.5 angstrom
+
+Minimum O-O approach in one 10 ps own-MD screen per water model (thesis Fig. 9.6). Models below 40 labels collapse into unphysical contact despite good force scores.
 ```
 
-A low force error alone is not enough. In the water campaign some candidates fitted forces well and then fell apart in MD. That is why a model is only accepted after it also passes a short-range (compressed dimer) check and a stability run driven by its own forces. Details: [Validation and gates](guide/validation.md).
+That is why every candidate also gets a stability run driven by its own forces, and why the promotion gate refuses to let an unstable model sample. Details: [Validation and gates](guide/validation.md).
 
-**Not yet shown:** two systems do not establish general transferability. Density at the hybrid level and a species-weighted convergence rule for fluoride are still to be tested.
+**Not yet shown:** two systems do not establish general transferability. Density at the hybrid level and a species-weighted convergence rule for fluoride are still to be tested, and only one selector (random) was used.
 
 ## Try it in two minutes
 
@@ -174,4 +173,4 @@ For a real campaign, continue with [Installation](getting-started/installation.m
 
 ## Citation
 
-Developed by Dhruv Sharma for the MPhil in Scientific Computing, University of Cambridge (2026). The method, validation protocol, results and limitations are in the thesis *Machine-Learned Interatomic Potentials in CP2K with GPU Acceleration, MACE Integration and CP2K-FORGE for Domain-Specific Models*. See [Provenance and citation](about/provenance.md).
+Developed by Dhruv Sharma for the MPhil in Scientific Computing, University of Cambridge (2026). The method, validation protocol, results and limitations are in the thesis *Machine-Learned Interatomic Potentials in CP2K* (CP2K-FORGE is Chapters 8.3 and 9.3). See [Provenance and citation](about/provenance.md).

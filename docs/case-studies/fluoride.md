@@ -7,7 +7,7 @@ alone are not enough; *where* they are sampled controls the observables.**
 The system is the published single-fluoride-in-64-water cell: 193 atoms in a 12.445 Å
 cube, adopted exactly via `system.seed_xyz`. It is stringent because the chemically
 important signal concentrates around one ion that contributes little to aggregate force
-scores. *(Thesis §4.3.2, see [provenance](../about/provenance.md); raw data:
+scores. *(Thesis §9.3.2, see [provenance](../about/provenance.md); raw data:
 [`convergence.json`](../assets/data/fluoride/convergence.json),
 [`gates_by_pass.json`](../assets/data/fluoride/gates_by_pass.json),
 [`species_by_pass.json`](../assets/data/fluoride/species_by_pass.json),
@@ -27,9 +27,13 @@ mid-campaign without changing the target method.
 The label set grows over eight passes, 9 → 64 frames. On the frozen 37-frame validation
 set, force RMSE falls **86.3 → 57.7 meV/Å**, and the campaign stops automatically: the
 last two improvements carry bootstrap upper edges of 1.86 and 1.51 meV/Å, inside the
-pre-registered 2.0 meV/Å band. Pass 8 is a convergence decision, not a manual cutoff.
+2.0 meV/Å band fixed before use. Pass 8 is a convergence decision, not a manual cutoff.
 
-![Fluoride learning curve](../assets/figures/fig_fluoride_learning.png)
+```{figure} ../assets/figures/fig_fluoride_learning.png
+:alt: Fluoride force RMSE against cumulative DFT labels
+
+Per-pass fluoride force RMSE on the frozen 37-frame validation set. Bars are bootstrap errors; the last two improvements fall inside the 2.0 meV/Å band (thesis Fig. 9.7).
+```
 
 (fluoride-on-policy-recovery)=
 ## The on-policy recovery: the pass history is the result
@@ -49,12 +53,11 @@ improve more slowly; one fluoride provides few shell configurations per frame), 
 robustness improves alongside: two of eight velocity seeds failed a mid-campaign screen,
 while all eight accepted pass-8 replicas run stably (closest O-O approach 2.53 Å).
 
-![Fluoride solvation structure](../assets/figures/fig_fluoride_structure.png)
+```{figure} ../assets/figures/fig_fluoride_structure.png
+:alt: Fluoride F-O, F-H, O-O RDFs and hydrogen VDOS
 
-*Accepted 64-label model (dashed), revPBE0-D3 AIMD (solid), published committee
-(dotted); the band spans the eight stable velocity-seed replicas. The committee curves
-here use its full deposited 50 ps run, so its printed VDOS (98.9) sits above the
-length-matched 11 ps value (97.7) used in the table.*
+F-O, F-H and O-O RDFs and hydrogen VDOS for the accepted 64-label model (dashed), revPBE0-D3 AIMD (solid) and the committee (dotted); the band spans eight stable replicas (thesis Fig. 9.8). The committee curves use its full deposited 50 ps run, so its printed VDOS (98.9) sits above the length-matched 11 ps value (97.7) in the table below.
+```
 
 ## Head-to-head with the committee
 

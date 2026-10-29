@@ -5,15 +5,16 @@ a parent trajectory.** The accepted models use 89 (water) and 64 (fluoride) targ
 labels against 814 and 299 structures in the published committee models, and no parent
 ab initio trajectory at all.
 
-*(Thesis §4.3.3, see [provenance](../about/provenance.md); raw data:
+*(Thesis §9.3.3, see [provenance](../about/provenance.md); raw data:
 [`forge_cost_curve.csv`](../assets/data/cost/forge_cost_curve.csv),
 [`mace_steptime_data.csv`](../assets/data/cost/mace_steptime_data.csv),
 [`backends_table_data.csv`](../assets/data/cost/backends_table_data.csv).)*
 
-![Cost ledger](../assets/figures/fig_cost_ledger.png)
+```{figure} ../assets/figures/fig_cost_ledger.png
+:alt: Label and trajectory counts for this work and the committee routes
 
-*Retained-label cost of the two routes. The third bar per system (the parent AIMD
-trajectory (600,000 / 104,000 steps) is the cost this workflow removes entirely.*
+Retained-label cost of this workflow and the published committee routes, log scale. The third bar per system, the parent AIMD trajectory (600,000 / 104,000 steps), is the cost this workflow removes (thesis Fig. 9.9).
+```
 
 :::{admonition} Extrapolation, clearly labelled
 :class: note
@@ -63,7 +64,11 @@ The cost curve plots held-out force RMSE against cumulative build cost in CPU
 core-equivalent hours (labels at per-frame medians + GPU stages at 55 core-equiv per
 A100-h):
 
-![Accuracy vs cumulative cost](../assets/figures/fig_forge_cost_curve.png)
+```{figure} ../assets/figures/fig_forge_cost_curve.png
+:alt: Force RMSE against cumulative build cost
+
+Held-out force RMSE against cumulative build cost in CPU core-equivalent hours. Draft companion figure, not in the thesis.
+```
 
 :::{admonition} Caveat on the cost curve
 :class: warning
@@ -76,7 +81,11 @@ over 209 → 1,640 core-equiv-h). The CSV ships with these docs.
 And the Schran-style scorecard collects the force / RDF / VDOS agreement bars for both
 compact models and both committees against the same ab initio references:
 
-![Scorecard](../assets/figures/fig_scorecard.png)
+```{figure} ../assets/figures/fig_scorecard.png
+:alt: Force, RDF and VDOS scores for compact models and committees
+
+Force, RDF and VDOS scores for both compact models and both committees against the same ab initio references. Companion figure, not in the thesis.
+```
 
 ## Deployment speed
 

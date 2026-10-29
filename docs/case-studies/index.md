@@ -1,22 +1,23 @@
-# Overview
+# Summary
 
 These pages document the two validation campaigns from the accompanying MPhil report
-(*Machine-Learned Interatomic Potentials in CP2K with GPU Acceleration, MACE Integration
-and CP2K-FORGE for Domain-Specific Models*, University of Cambridge, 2026, Chapter 4), with the report's figures and the raw data files vendored into this repository
+(*Machine-Learned Interatomic Potentials in CP2K*, University of Cambridge, 2026,
+Section 9.3), with the report's figures and the raw data files vendored into this repository
 ([provenance manifest](../assets/README.md), CC BY 4.0).
 
 Both campaigns ran **the same code and promotion logic**, differing only in
 system-specific thresholds and sampling settings, and both were labelled at hybrid
 **revPBE0-D3** (ADMM, truncated Coulomb; the level now shipped as
 `configs/water_hybrid.yaml` via [`dft.mode: hybrid`](../guide/hybrid-dft.md)). In both,
-the campaign stopped by the **pre-registered convergence rule**, not by the available
+the campaign stopped by a **convergence rule fixed before use**, not by the available
 compute budget: gates, validation sets, thresholds and the bootstrap seed were fixed
 before use.
 
-![The two validation cells](../assets/figures/fig_systems.png)
+```{figure} ../assets/figures/fig_systems.png
+:alt: Bulk water and fluoride-in-water simulation cells
 
-*Bulk water (64 H₂O) and fluoride-in-water (one F⁻ in 64 H₂O, 193 atoms, the published
-cell) at a common scale.*
+Bulk water (64 H₂O, 192 atoms) and fluoride in water (one F⁻ in 64 H₂O, 193 atoms) at a common scale (thesis Fig. 9.3).
+```
 
 **Water** offers a neutral hydrogen-bond network with a strong published reference: the
 committee potential trained on 814 structures selected from a 300 ps parent ab initio
@@ -40,7 +41,7 @@ and F-H solvation-shell structure yet contributes little to aggregate force scor
   enhanced sampling) is **enabled, not measured**: no such production run is
   claimed.
 - Density and TMD claims follow the audited language described in
-  [Showcase and density](../guide/showcase-density.md).
+  [Density probe](../guide/showcase-density.md).
 :::
 
 | Page | What it covers |

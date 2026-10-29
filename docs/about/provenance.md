@@ -14,11 +14,11 @@ cost, the direct motivation for moving the evaluator onto GPUs. In double precis
 the GPU path preserves exact parity with the CPU reference; in mixed precision it
 reaches **2.2-2.4× the equal-cost CPU throughput** (1.6-1.7× in double precision):
 
-![GPU HDNNP iso-cost throughput](../assets/figures/fig_gpu_isocost.png)
+```{figure} ../assets/figures/fig_gpu_isocost.png
+:alt: GPU HDNNP iso-cost throughput
 
-*Iso-cost throughput of native HDNNP dynamics for H₂O-16384. One A100 is costed at 55
-CPU core-equivalents; GPU points use one to four A100s. Values are warm-up-excluded
-steady-state means over five allocations.*
+Iso-cost throughput of native HDNNP dynamics for H₂O-16384 (thesis Fig. 9.1).
+```
 
 With a fast learned-force evaluator in hand, CP2K was then extended to the MACE model
 family through two backends (metatomic for portable exported models, Symmetrix for
@@ -26,10 +26,11 @@ fast torch-free compact-model evaluation
 ([PR #5739](https://github.com/cp2k/cp2k/pull/5739), draft)), each with a different
 GPU/CPU step-time profile:
 
-![MACE backend step time](../assets/figures/fig_mace_steptime.png)
+```{figure} ../assets/figures/fig_mace_steptime.png
+:alt: MACE backend step time against system size
 
-*Steady-state step time against system size for metatomic and Symmetrix,
-MACE-OMAT-0 small, on one A100 GPU and a 32-thread Ice Lake CPU node.*
+Steady-state step time for metatomic and Symmetrix, MACE-OMAT-0 small (thesis Fig. 9.2).
+```
 
 Only once MACE was an ordinary CP2K force term did the natural next question follow:
 **can CP2K build a compact model as well as run it?** CP2K-FORGE answers that: a
@@ -52,11 +53,11 @@ Department of Physics, and extracted into this standalone repository from the
 author's CP2K development fork (`cp2k-mlp`, branch `mace-distill-pipeline`, which
 stays frozen as report provenance). The accompanying thesis is
 
-> Dhruv Sharma, *Machine-Learned Interatomic Potentials in CP2K with GPU Acceleration,
-> MACE Integration and CP2K-FORGE for Domain-Specific Models*, MPhil thesis, Department
-> of Physics, University of Cambridge, 2026.
+> Dhruv Sharma, *Machine-Learned Interatomic Potentials in CP2K*, MPhil thesis
+> (Scientific Computing), Department of Physics, University of Cambridge, 2026.
+> Supervisors: Dr Christoph Schran and Dr Peter Cooke.
 
-The [case studies](../case-studies/index.md) reproduce that report's Chapter 4 FORGE
+The [results pages](../case-studies/index.md) reproduce the thesis's Section 9.3 FORGE
 results; the figures and raw data under `docs/assets/` are vendored verbatim from the
 report's data package (*Report 2 data package*, v1.1, 2026-08-13, CC BY 4.0); see the
 [provenance manifest](../assets/README.md) for the file-by-file mapping.
@@ -95,5 +96,5 @@ SHA-256:
 
 ## Licensing
 
-- Code: [MIT](license.md).
+- Code: [MIT](license.md). Release history: [Changelog](changelog.md).
 - Vendored documentation assets (`docs/assets/`): CC BY 4.0, © 2026 Dhruv Sharma.

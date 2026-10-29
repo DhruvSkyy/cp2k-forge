@@ -20,8 +20,8 @@ functional, with no inherited bias from the foundation model.
   reference example uses revPBE-D3 for liquid water).
 - **Model = trained from scratch.** A compact MACE learns only from the DFT labels.
 - This is **not** distillation (the foundation model never provides labels), **not**
-  fine-tuning (no weights are inherited), and **not** query-by-committee (selection is
-  diversity sampling, not uncertainty sampling).
+  fine-tuning (no weights are inherited), and **not** query-by-committee (frames are
+  selected at random or for diversity, never by committee disagreement).
 
 The D3 correction on the generator is mandatory for water: raw MACE-MP-0 has no dispersion,
 so the simulated liquid evaporates and the density collapses.
@@ -34,13 +34,14 @@ so the simulated liquid evaporates and the density collapses.
  GENERATE --> SUBSAMPLE --> LABEL (DFT) --> TRAIN ------> converged? -+ --> SHOWCASE
  explorer     select        CP2K, GGA      compact MACE    (no)            density
  MD           decorrelated  or hybrid      on the labels                   isobar
- (pass 1: foundation model + D3; pass >=2: the latest promoted model)
+ (pass 1: foundation model + D3; later: the latest (promoted) compact model)
 ```
 
-Each pass explores configuration space, selects the most informative new structures,
+Each pass explores configuration space, selects a small batch of decorrelated structures,
 labels them with DFT, and retrains. The explorer is the foundation model on pass 1 and the
-latest trained model on later passes (once it has passed a promotion gate). The loop stops
-when the held-out force error and the target property both stop improving.
+latest trained model on later passes (once it has passed a promotion gate). The loop stops on
+a plateau or diminishing-returns rule, or at the pass budget (see
+[Validation and gates](../guide/validation.md)).
 
 ## Stage-by-stage implementation
 
@@ -50,10 +51,10 @@ and persists progress after each one.
 | Stage     | Module / function                                     | What it does                                                                                                                                                                                                                        |
 | --------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Generate  | `generate.build_explorer`, `generate.generate_frames` | MD over a temperature/density grid using an ASE + mace-torch engine (`engines.ASEMaceEngine`). Trajectories are decorrelated (`decorrelation`) so only time-independent frames survive.                                             |
-| Subsample | `subsample.subsample` (+ `direct`)                    | Diversity selection (DIRECT: foundation-model features -> PCA -> KMeans, or farthest-point sampling) picks the minimal spanning set, so the DFT budget is spent on distinct structures.                                             |
+| Subsample | `subsample.subsample` (+ `direct`)                    | Picks the DFT batch: farthest-point sampling (default), DIRECT (foundation-model features -> PCA -> KMeans), or random decorrelated frames (used for the thesis results). |
 | Label     | `label.label_frames`, `cp2k_io`, `e0s`                | Writes a CP2K single-point input per structure (`cp2k_io.write_singlepoint_input`), runs CP2K, and parses the log (`cp2k_io.parse_singlepoint_output`). Isolated-atom reference energies (E0s) are computed once at the same level. |
 | Train     | `train.train_from_scratch`                            | Wraps `mace_run_train` to fit a fresh compact MACE (small `num_channels`/`max_ell`/`r_max`, the speed claim depends on this).                                                                                                      |
-| Validate  | `validate.validate_model`                             | Held-out force RMSE plus RDF/VDOS self-convergence scores, and an NPT density probe.                                                                                                                                                |
+| Validate  | `validate.validate_model`                             | Held-out force RMSE, a stability MD on the candidate's own forces, RDF/VDOS self-convergence scores and a density probe. |
 | Showcase  | `showcase/run_isobar.py`, `showcase/density_tmd.py`   | Runs the 1 atm density isobar and analyses the density-maximum region.                                                                                                                                                       |
 
 ### Data flow
@@ -80,7 +81,8 @@ stage across separate jobs (`cp2k-forge --stop-after label`).
   test set (a constant yardstick across passes).
 - **Physical fidelity** is the showcase: the 1 atm density isobar with block-statistics
   error bars, read against the labelling functional's own reference (never against
-  experiment, see the claim constraints in the Showcase guide).
+  experiment, see the claim constraints on the
+  [Density probe](../guide/showcase-density.md) page).
 
 ## A physics caveat worth stating
 

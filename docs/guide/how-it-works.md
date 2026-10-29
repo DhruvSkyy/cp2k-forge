@@ -26,9 +26,12 @@ fires. This page walks the loop stage by stage and names the module that owns ea
 
 Sampling produces the pool from which expensive DFT labels are drawn. Early passes use
 the foundation model (with D3 dispersion where the system needs it; raw MACE-MP-0 has
-none and liquid water evaporates without it). After the **sampling switch**, the newest
-promoted compact model generates the structures used to train the next one; that keeps
-labels close to the region where the final model will actually run. The explored grid is
+none and liquid water evaporates without it). Later passes sample with the newest
+compact model, which keeps labels close to the region where the final model will
+actually run. With the promotion gate on (`loop.promote_min_force_pct > 0`), only a
+model that passed it may sample; until one does, the foundation model keeps sampling.
+In the thesis campaigns this **sampling switch** came at pass 5 (water) and pass 6
+(fluoride). The explored grid is
 a list of state points (temperatures × density scales, or explicit pressures), each cell
 a short MD trajectory with deterministic per-cell velocity seeds.
 
@@ -43,13 +46,12 @@ sampling arithmetic that could never yield the requested number of uncorrelated 
 
 *Code:* `cp2k_forge.subsample` (+ `cp2k_forge.direct`)
 
-The selector chooses the DFT batch from the decorrelated pool. The default draws
-**random decorrelated frames**, so a campaign tests the sampler and the gates rather
-than a separate active-learning rule. Uncertainty- or diversity-based selectors
-substitute through the same config field (`subsample.method`: `fps`, `direct` =
-foundation-model features → PCA → KMeans, or `none`), but note that the report's
-results were obtained with `random`, and no selector comparison has been run at a
-matched label budget.
+The selector chooses the DFT batch from the decorrelated pool through
+`subsample.method`: `fps` (farthest-point sampling, the package default), `direct`
+(foundation-model features → PCA → KMeans), `random` or `none`. The thesis campaigns and
+the shipped `water_hybrid.yaml` use **`random`**, so those results test the sampler and
+the gates rather than a separate active-learning rule. No selector comparison has been
+run at a matched label budget.
 
 ## Label
 
@@ -90,13 +92,13 @@ model family could be trained by swapping this module while keeping the loop unc
 
 Validation separates three different jobs, and keeping them separate is the design:
 
-- **Promotion** (may this candidate become the explorer?) requires lowering held-out
-  force RMSE relative to the incumbent, passing a dimer-compression screen against
-  unphysical short-range attraction, and surviving a short MD trajectory driven by the
-  candidate itself. Force error is an entry condition, not the deployment criterion,
-  because unstable dynamics can hide behind a good aggregate force score.
-- **Convergence** (may the campaign stop?) is the pre-registered plateau rule on
-  held-out force RMSE; see [Validation and gates](validation.md).
+- **Promotion** (may this candidate sample the next pass?) is the optional sampler
+  gate: force score, density window and a short MD trajectory driven by the candidate
+  itself. Force error alone is not enough, because unstable dynamics can hide behind a
+  good aggregate force score.
+- **Stopping** (may the campaign end?) is a plateau or diminishing-returns rule on
+  held-out force RMSE, or the pass budget. The thesis results additionally used a
+  dimer screen and a paired-bootstrap rule; see [Validation and gates](validation.md).
 - **Diagnostics** (how good is it, physically?) are RDF and VDOS comparisons, reported
   after deployment but never used as gates.
 
