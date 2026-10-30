@@ -351,6 +351,9 @@ class ValidateConfig:
     # distances that must survive the trajectory (a collapsing model violates these first).
     stability_min_oo_ang: float = 2.0
     stability_min_oh_ang: float = 0.7
+    # Floor on the closest approach of ANY two atoms; applies to every chemistry, so a
+    # system without O/H still gets a real blow-up check.
+    stability_min_any_ang: float = 0.5
     # Published-reference overlay for the figure suite: the target model's literature
     # numbers, drawn on every per-pass plot so progress reads directly against the
     # published baseline. Free-form dict, e.g.
@@ -470,6 +473,15 @@ class Config:
         for owner, name in ((self.explore, "explore"), (self.showcase, "showcase")):
             if owner.barostat not in ("berendsen", "mtk"):
                 raise ValueError(f"{name}.barostat must be 'berendsen' or 'mtk'")
+        if (
+            self.explore.sample_mode == "decorrelation"
+            and self.explore.decorrelation_observable == "hbond"
+            and "O" not in self.system.elements
+        ):
+            raise ValueError(
+                "explore.decorrelation_observable 'hbond' needs O in system.elements; "
+                "use 'energy' (or 'density' for NPT) for this system"
+            )
         if self.explore.nvt_thermostat not in ("langevin", "bussi"):
             raise ValueError("explore.nvt_thermostat must be 'langevin' or 'bussi'")
         if self.subsample.method not in ("fps", "direct", "random", "none"):

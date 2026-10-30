@@ -80,20 +80,30 @@ def _load_seed(cfg):
     return load_seed(cfg)
 
 
-def stability_metrics(frames, min_oo_ang: float = 2.0, min_oh_ang: float = 0.7) -> dict:
+def stability_metrics(
+    frames, min_oo_ang: float = 2.0, min_oh_ang: float = 0.7, min_any_ang: float = 0.5
+) -> dict:
     """Geometric blow-up check over an MD trajectory.
 
-    A collapsing/evaporating model violates the shortest physical distances first:
-    intermolecular O-O below ~2 A or O-H below ~0.7 A never occur in liquid water.
-    Returns the observed minima and an `ok` verdict against the thresholds.
+    A collapsing model violates the shortest physical distances first. Every system is
+    held to `min_any_ang` on the closest approach of any two atoms. Systems containing
+    O and H are additionally held to the water floors: intermolecular O-O below ~2 A or
+    O-H below ~0.7 A never occur in liquid water. Returns the observed minima and an
+    `ok` verdict against the thresholds.
     """
     import numpy as np
 
     min_oo = float("inf")
     min_oh = float("inf")
+    min_any = float("inf")
+    species = set()
     for atoms in frames:
         sym = np.asarray(atoms.get_chemical_symbols())
+        species.update(sym.tolist())
         d = atoms.get_all_distances(mic=True)
+        if len(sym) >= 2:
+            np.fill_diagonal(d, np.inf)
+            min_any = min(min_any, float(d.min()))
         o_idx = np.where(sym == "O")[0]
         h_idx = np.where(sym == "H")[0]
         if len(o_idx) >= 2:
@@ -102,13 +112,21 @@ def stability_metrics(frames, min_oo_ang: float = 2.0, min_oh_ang: float = 0.7) 
             min_oo = min(min_oo, float(doo.min()))
         if len(o_idx) and len(h_idx):
             min_oh = min(min_oh, float(d[np.ix_(o_idx, h_idx)].min()))
-    ok = (not frames) or (min_oo >= min_oo_ang and min_oh >= min_oh_ang)
+    ok = (not frames) or (
+        min_any >= min_any_ang and min_oo >= min_oo_ang and min_oh >= min_oh_ang
+    )
+    water_checks = [
+        p for p, el in (("O-O", {"O"}), ("O-H", {"O", "H"})) if el <= species
+    ]
     return {
         "n_frames": len(frames),
+        "min_any_ang": None if min_any == float("inf") else round(min_any, 3),
         "min_oo_ang": None if min_oo == float("inf") else round(min_oo, 3),
         "min_oh_ang": None if min_oh == float("inf") else round(min_oh, 3),
+        "threshold_any_ang": min_any_ang,
         "threshold_oo_ang": min_oo_ang,
         "threshold_oh_ang": min_oh_ang,
+        "species_checks": ",".join(water_checks) or "none",
         "ok": bool(ok),
     }
 
@@ -685,7 +703,7 @@ def validate_model(
         cfg, model_path, workdir=workdir / "spotcheck", return_frames=True
     )
     stability = stability_metrics(
-        frames, v.stability_min_oo_ang, v.stability_min_oh_ang
+        frames, v.stability_min_oo_ang, v.stability_min_oh_ang, v.stability_min_any_ang
     )
     if spot["n_frames"] > 0:
         scores["force_rmse_pct"] = round(

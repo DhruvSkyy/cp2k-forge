@@ -38,11 +38,10 @@ export CP2K_BIN=/path/to/cp2k.psmp     # see "CP2K as a dependency" for the full
 cp2k-forge --config configs/water.yaml
 ```
 
-`configs/water.yaml` is a semi-local revPBE-D3 water campaign;
-`configs/water_hybrid.yaml` is the hybrid revPBE0-D3 level used by the
-[case studies](../case-studies/index.md). Edit one file to retarget the pipeline: DFT
-level, explore grid, model size, convergence rule
-([configuration reference](../guide/configuration.md)).
+`configs/water.yaml` is a semi-local revPBE-D3 water campaign and
+`configs/water_hybrid.yaml` the hybrid revPBE0-D3 one used for the
+[Results](../case-studies/index.md). To build a potential for something else, follow
+[Use it on your own system](your-system.md).
 
 The run is **resumable**: every stage transition is persisted to
 `<workdir>/manifest.json`, and finished DFT single points are keyed by structure hash,
@@ -61,6 +60,7 @@ cp2k-forge --config configs/water.yaml \
 
 ## Where next
 
+- [Use it on your own system](your-system.md): what to change in the config.
 - [CP2K as a dependency](cp2k-dependency.md): how the binary and its data files are
   found, and what to export on a cluster.
 - [Campaigns on HPC](../guide/campaigns-hpc.md): splitting CPU labelling from GPU

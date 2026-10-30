@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- The own-MD stability check now applies to any chemistry: `validate.stability_min_any_ang`
+  (default 0.5 Å) bounds the closest approach of any two atoms. Before, a system without
+  oxygen passed the check without testing anything. The O-O / O-H floors still apply
+  when O and H are present.
+- Loading a config now fails when `explore.decorrelation_observable` is `hbond` and the
+  system has no oxygen, with a hint to use `energy`.
+- New docs page, *Use it on your own system*.
+
 ## 0.1.0 (2026-10-10)
 
 First standalone release, extracted from the `tools/mace-distill` directory of the
@@ -17,7 +27,7 @@ cp2k-mlp development fork (branch `mace-distill-pipeline`).
   and case studies reproducing the report's water and fluoride campaigns with vendored
   figures and raw data (CC BY 4.0, `docs/assets/README.md` manifest). `CITATION.cff`
   added.
-- `dft.vdw: dftd3 | none` — dispersion-free labelling levels are now expressible (the
+- `dft.vdw: dftd3 | none`: dispersion-free labelling levels are now expressible (the
   vdW section is stripped from all rendered inputs); the default rendering is unchanged.
 - `cp2k-forge --version`, `cp2k_forge.__version__`, and the package version in the
   doctor header; `[project.urls]` in the package metadata.

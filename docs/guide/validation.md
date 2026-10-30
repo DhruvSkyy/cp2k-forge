@@ -13,9 +13,11 @@ used for the thesis results.
 ### Per-pass checks
 
 After training, every candidate is scored on held-out frames and run in a short MD
-trajectory driven by its own forces. The stability check fails when the closest O-O or
-O-H approach drops below `validate.stability_min_oo_ang` (default 2.0 Å) or
-`validate.stability_min_oh_ang` (default 0.7 Å).
+trajectory driven by its own forces. The stability check fails when any two atoms come
+closer than `validate.stability_min_any_ang` (default 0.5 Å). For systems containing O
+and H it also fails when the closest O-O or O-H approach drops below
+`validate.stability_min_oo_ang` (default 2.0 Å) or `validate.stability_min_oh_ang`
+(default 0.7 Å).
 
 ### Sampler promotion gate
 

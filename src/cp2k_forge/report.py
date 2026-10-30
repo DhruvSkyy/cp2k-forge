@@ -73,8 +73,10 @@ def _scorecard_rows(report: dict, pass_rec: dict, prev_rec: dict | None, cfg) ->
             (
                 "2. Stability MD",
                 f"{v.spotcheck_md_steps} steps NVT @ {v.spotcheck_temperature_k:.0f} K",
+                f"min any >= {stab.get('threshold_any_ang')} A, "
                 f"min O-O >= {stab.get('threshold_oo_ang')} A, "
                 f"min O-H >= {stab.get('threshold_oh_ang')} A",
+                f"min any {_fmt(stab.get('min_any_ang'))} A, "
                 f"min O-O {_fmt(stab.get('min_oo_ang'))} A, "
                 f"min O-H {_fmt(stab.get('min_oh_ang'))} A",
                 _verdict(stab.get("ok")),
@@ -348,7 +350,8 @@ def print_scorecard(report: dict, pass_index: int) -> None:
         if stab:
             print(
                 f"  Stability    {'OK' if stab.get('ok') else 'FAILED'} "
-                f"(min O-O {stab.get('min_oo_ang')} A, min O-H {stab.get('min_oh_ang')} A)"
+                f"(min any {stab.get('min_any_ang')} A, "
+                f"min O-O {stab.get('min_oo_ang')} A, min O-H {stab.get('min_oh_ang')} A)"
             )
         print(f"  Overall                   -> {s['overall_pct']:.0f}%")
         for note in rep.get("notes", []):

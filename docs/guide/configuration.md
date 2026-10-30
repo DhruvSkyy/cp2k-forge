@@ -116,7 +116,7 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `deuterium_masses` | false | opt-in D masses (pair with a 1 fs step) |
 | `density_min_gcc`, `density_max_gcc`, `clamp_patience` | 0.6, 1.3, 5 | stability clamp: abort a trajectory whose density leaves the window (guards explorer collapse). With `dft.mode: hybrid`, `density_max_gcc` is also checked against HFX-radius legality at load |
 | `sample_mode` | `decorrelation` | `decorrelation` (thin each trajectory at its measured autocorrelation time) or `fixed` |
-| `decorrelation_observable` | `hbond` | `hbond` \| `energy` \| `density` |
+| `decorrelation_observable` | `hbond` | `hbond` (water only; needs O) \| `energy` \| `density` |
 | `target_uncorrelated` | 100 | per-trajectory cap on uncorrelated frames |
 | `min_sample_every_fs` | 1000 | 1 ps floor (the H-bond-lifetime argument) |
 | `on_undersample` | `warn` | `fail` aborts generate when a cell cannot yield the target at the demanded stride; a static feasibility check at load catches the arithmetic version before any MD |
@@ -185,6 +185,7 @@ GGA path byte-identical. Full walk-through: [Hybrid DFT](hybrid-dft.md).
 | `density_probe_steps`, `density_probe_temperature_k` | 2000, null | NPT density probe; 2000 steps is a smoke value; a campaign needs ~100 ps for a ~0.006 g/cc standard error |
 | `density_ref_gcc`, `goo_peak_r_ref`, `goo_peak_h_ref` | null | experimental anchors, **reported next to scores, never gated** (classical nuclei at a given functional should not reproduce experiment exactly) |
 | `stability_min_oo_ang`, `stability_min_oh_ang` | 2.0, 0.7 | the own-MD stability gate's minimum approach distances |
+| `stability_min_any_ang` | 0.5 | floor on the closest approach of any two atoms; applies to every system |
 | `published_reference` | null | literature overlay for the per-pass figure suite |
 
 ## `showcase`

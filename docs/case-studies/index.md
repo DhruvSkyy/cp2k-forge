@@ -1,5 +1,8 @@
 # Summary
 
+These are worked examples of the method on two aqueous systems. They show what a
+finished campaign looks like; your own system needs its own validation.
+
 These pages document the two validation campaigns from the accompanying MPhil report
 (*Machine-Learned Interatomic Potentials in CP2K*, University of Cambridge, 2026,
 Section 9.3), with the report's figures and the raw data files vendored into this repository

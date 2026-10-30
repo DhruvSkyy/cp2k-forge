@@ -119,9 +119,8 @@ a torch-free regression test, so the reference numbers are consistent everywhere
 
 ## Seeding
 
-No starting configuration has to be supplied manually: each configured state point can
-seed a short foundation-model trajectory, so the only geometric input is the cell and
-composition. A prepared structure is still accepted through `system.seed_xyz` when an
-exact starting cell matters: the fluoride case study adopts the published 193-atom cell
-this way, and the shipped examples (`examples/water32.xyz`, `examples/water64.xyz`) do
-the same for water.
+Every campaign starts from one structure, `system.seed_xyz` (extended XYZ, orthorhombic
+cell). Each state point then runs its own short trajectory from that seed, so the seed
+only needs to be roughly right. The shipped examples are `examples/water32.xyz` and
+`examples/water64.xyz`; the fluoride worked example used the published 193-atom cell.
+For other systems, see [Use it on your own system](../getting-started/your-system.md).
